@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+/// <summary>
+/// 输入管理
+/// </summary>
 public class InPutManager : MonoBehaviour
 {
     private UIManager _uiManager;

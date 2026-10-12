@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 资源管理
+/// </summary>
 public class ResourceManager : MonoBehaviour
 {
     // Start is called before the first frame update

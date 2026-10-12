@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 界面管理
+/// </summary>
 public class UIManager : MonoBehaviour
 {
     private ResourceManager _resourceManager;
