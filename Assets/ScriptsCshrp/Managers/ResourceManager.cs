@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -8,28 +5,24 @@ using UnityEngine;
 /// </summary>
 public class ResourceManager : MonoBehaviour
 {
-    // Start is called before the first frame update
+    // ==================== Unity 生命周期 ====================
+
+    /// <summary>
+    /// 输出资源管理器的初始化日志。
+    /// </summary>
     void Awake()
     {
         Debug.Log("ResourceManager 初始化完成");
     }
 
-    void Start()
-    {
-        
-    }
+    // ==================== 预制体加载与实例化 ====================
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-    
     /// <summary>
-    /// 寻找到预制体
+    /// 从 Resources 目录加载指定路径的预制体。
+    /// 加载失败时输出错误日志并返回 null。
     /// </summary>
-    /// <param name="path"></param>
-    /// <returns></returns>
+    /// <param name="path">相对于 Resources 目录的资源路径，不包含文件扩展名。</param>
+    /// <returns>加载成功的预制体；加载失败时为 null。</returns>
     public GameObject LoadPrefab(string path)
     {
         GameObject prefab = Resources.Load<GameObject>(path);
@@ -39,16 +32,17 @@ public class ResourceManager : MonoBehaviour
             Debug.LogError("Prefab 加载失败：" + path);
             return null;
         }
-        
+
         Debug.Log("prefab 加载成功：" + path);
         return prefab;
     }
 
     /// <summary>
-    /// 实例化预制体
+    /// 加载并实例化指定路径的预制体。
+    /// 加载失败时返回 null。
     /// </summary>
-    /// <param name="path"></param>
-    /// <returns></returns>
+    /// <param name="path">相对于 Resources 目录的资源路径，不包含文件扩展名。</param>
+    /// <returns>创建的预制体实例；加载失败时为 null。</returns>
     public GameObject InstantiatePrefab(string path)
     {
         GameObject prefab = LoadPrefab(path);
@@ -57,8 +51,7 @@ public class ResourceManager : MonoBehaviour
             return null;
         }
         GameObject instance = Instantiate(prefab);
-        
+
         return instance;
     }
-    
 }

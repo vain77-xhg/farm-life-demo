@@ -1,15 +1,20 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+
 /// <summary>
 /// 事件管理器
 /// 负责无参数事件的订阅、取消订阅和发布
 /// </summary>
 public class EventManager : MonoBehaviour
 {
-    //保存所有事件及其对应的回调方法
+    // ==================== 字段 ====================
+
+    // 保存所有事件及其对应的回调方法
     private readonly Dictionary<string, Action> _eventTable = new Dictionary<string, Action>();
-    
+
+    // ==================== 事件订阅与取消订阅 ====================
+
     /// <summary>
     /// 订阅指定事件。
     /// 如果事件已经存在，则追加新的回调方法；
@@ -19,16 +24,16 @@ public class EventManager : MonoBehaviour
     /// <param name="callback">事件触发时需要执行的方法。</param>
     public void Subscribe(string eventName, Action callback)
     {
-        //如果事件已经存在，就追加新的回调方法
+        // 如果事件已经存在，就追加新的回调方法
         if (_eventTable.ContainsKey(eventName))
         {
             _eventTable[eventName] += callback;
             return;
         }
-        //如果事件不存在，就创建新的事件记录
+        // 如果事件不存在，就创建新的事件记录
         _eventTable.Add(eventName, callback);
     }
-    
+
     /// <summary>
     /// 取消订阅指定事件。
     /// 如果事件存在，则移除对应的回调方法。
@@ -53,7 +58,9 @@ public class EventManager : MonoBehaviour
             _eventTable.Remove(eventName);
         }
     }
-    
+
+    // ==================== 事件发布 ====================
+
     /// <summary>
     /// 发布指定事件。
     /// 如果事件存在，则执行该事件下所有已订阅的回调方法。

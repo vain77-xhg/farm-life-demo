@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -8,35 +6,31 @@ using UnityEngine.EventSystems;
 /// </summary>
 public class InPutManager : MonoBehaviour
 {
-    private UIManager _uiManager;
-    public void Initialize(UIManager uiManager)
-    {
-        _uiManager = uiManager;
-    }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    // ==================== 字段 ====================
 
-    // Update is called once per frame
+    private EventManager _eventManager;
+
+    // ==================== Unity 生命周期 ====================
+
+    /// <summary>
+    /// 每帧检测玩家输入。
+    /// Tab 发布背包切换事件，Escape 发布设置切换事件；
+    /// 鼠标左键点击时检查指针是否位于 UI 上。
+    /// </summary>
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             Debug.Log("检测到Tab按键按下");
-            _uiManager.ToggleInventory();
+            _eventManager.Publish("ToggleInventory");
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Debug.Log("检测到ESC键按下");
-            _uiManager.ToggleSettings();
+            _eventManager.Publish("ToggleSettings");
         }
 
-        
-        
-        
         if (Input.GetMouseButtonDown(0))
         {
             Debug.Log("检测到鼠标左键按下");
@@ -48,10 +42,20 @@ public class InPutManager : MonoBehaviour
             else
             {
                 Debug.Log("鼠标点击发生在UI外");
-                //处理游戏世界的点击
+                // 处理游戏世界的点击
             }
         }
     }
 
-    
+    // ==================== 初始化 ====================
+
+    /// <summary>
+    /// 初始化输入管理器。
+    /// 保存事件管理器引用，用于发布玩家输入事件。
+    /// </summary>
+    /// <param name="eventManager">事件管理器引用。</param>
+    public void Initialize(EventManager eventManager)
+    {
+        _eventManager = eventManager;
+    }
 }
