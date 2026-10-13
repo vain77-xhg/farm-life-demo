@@ -50,19 +50,13 @@ public class Bootstrap : MonoBehaviour
     private void CreateManagers()
     {
         //创建ResourceManager
-        GameObject resourceObject = new GameObject("ResourceManager");
-        resourceObject.transform.SetParent(transform);
-        _resourceManager = resourceObject.AddComponent<ResourceManager>();
+        _resourceManager = CreateManager<ResourceManager>("ResourceManager");
         
         //创建UIManager
-        GameObject uiObject = new GameObject("UIManager");
-        uiObject.transform.SetParent(transform);    
-        _uiManager = uiObject.AddComponent<UIManager>();
+        _uiManager = CreateManager<UIManager>("UIManager");
         
         //创建InputManager
-        GameObject inputObject = new GameObject("InputManager");
-        inputObject.transform.SetParent(transform);
-        _inputManager = inputObject.AddComponent<InPutManager>();
+        _inputManager = CreateManager<InPutManager>("InputManager");
     }
 
     /// <summary>
@@ -86,5 +80,28 @@ public class Bootstrap : MonoBehaviour
         { 
             testCube.SetActive(false);
         }
+    }
+
+    /// <summary>
+    /// 创建指定类型的管理器组件，
+    /// 将其 GameObject 设置为 Bootstrap 的子物体，
+    /// 并返回创建后的组件引用。
+    /// </summary>
+    /// <typeparam name="T">要创建的管理器组件类型。</typeparam>
+    /// <param name="objectName">新建 GameObject 的名称。</param>
+    /// <returns>创建完成的管理器组件引用。</returns>
+    private T CreateManager<T>(string objectName) where T : Component
+    {
+        // 创建一个空的 GameObject
+        GameObject managerObject = new GameObject(objectName);
+
+        // 将这个 GameObject 设置为 Bootstrap 的子物体
+        managerObject.transform.SetParent(transform);
+
+        // 给这个 GameObject 添加 T 类型的组件
+        T manager = managerObject.AddComponent<T>();
+
+        // 返回这个组件的引用
+        return manager;
     }
 }
