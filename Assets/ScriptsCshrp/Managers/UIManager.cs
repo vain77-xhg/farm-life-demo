@@ -35,10 +35,10 @@ public class UIManager : MonoBehaviour
         }
 
         // 取消背包界面事件订阅
-        _eventManager.UnSubscribe("ToggleInventory", ToggleInventory);
+        _eventManager.UnSubscribe(GameEvents.ToggleInventory, ToggleInventory);
 
         // 取消设置界面事件订阅
-        _eventManager.UnSubscribe("ToggleSettings", ToggleSettings);
+        _eventManager.UnSubscribe(GameEvents.ToggleSettings, ToggleSettings);
     }
 
     // ==================== 初始化 ====================
@@ -56,8 +56,8 @@ public class UIManager : MonoBehaviour
         _eventManager = eventManager;
         Debug.Log("UIManager 已经接收到 ResourceManager");
 
-        _eventManager.Subscribe("ToggleInventory", ToggleInventory);
-        _eventManager.Subscribe("ToggleSettings", ToggleSettings);
+        _eventManager.Subscribe(GameEvents.ToggleInventory, ToggleInventory);
+        _eventManager.Subscribe(GameEvents.ToggleSettings, ToggleSettings);
     }
 
     // ==================== 背包 UI ====================

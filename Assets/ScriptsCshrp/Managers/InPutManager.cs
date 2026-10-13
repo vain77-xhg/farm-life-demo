@@ -1,3 +1,4 @@
+using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -22,13 +23,13 @@ public class InPutManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             Debug.Log("检测到Tab按键按下");
-            _eventManager.Publish("ToggleInventory");
+            _eventManager.Publish(GameEvents.ToggleInventory);
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Debug.Log("检测到ESC键按下");
-            _eventManager.Publish("ToggleSettings");
+            _eventManager.Publish(GameEvents.ToggleSettings);
         }
 
         if (Input.GetMouseButtonDown(0))
