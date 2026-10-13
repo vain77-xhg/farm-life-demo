@@ -18,6 +18,7 @@ public class Bootstrap : MonoBehaviour
     private UIManager _uiManager;
     private ResourceManager _resourceManager;
     private InPutManager _inputManager;
+    private EventManager _eventManager;
 
     /// <summary>
     /// 游戏框架启动入口。
@@ -57,6 +58,9 @@ public class Bootstrap : MonoBehaviour
         
         //创建InputManager
         _inputManager = CreateManager<InPutManager>("InputManager");
+        
+        //创建EventManager
+        _eventManager = CreateManager<EventManager>("EventManager");
     }
 
     /// <summary>
