@@ -12,7 +12,7 @@ public class UIManager : MonoBehaviour
     private GameObject _inventoryUI;
     private GameObject _settingsUI;
 
-    //自动执行
+    //由 Bootstrap 调用，传入资源管理器引用
     public void Initialize(ResourceManager resourceManager)
     {
         _resourceManager = resourceManager;
