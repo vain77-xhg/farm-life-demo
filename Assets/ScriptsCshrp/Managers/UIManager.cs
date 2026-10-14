@@ -56,6 +56,7 @@ public class UIManager : MonoBehaviour
         _eventManager = eventManager;
         Debug.Log("UIManager 已经接收到 ResourceManager");
 
+        //订阅事件
         _eventManager.Subscribe(GameEvents.ToggleInventory, ToggleInventory);
         _eventManager.Subscribe(GameEvents.ToggleSettings, ToggleSettings);
     }
@@ -149,5 +150,12 @@ public class UIManager : MonoBehaviour
         {
             _settingsUI.SetActive(false);
         }
+    }
+    
+    // ==================== 测试方法 ====================
+    
+    private void UpdateGold(int gold)
+    {
+        Debug.Log("UpdataGold: " + gold);
     }
 }

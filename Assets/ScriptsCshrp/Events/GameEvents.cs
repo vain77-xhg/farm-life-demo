@@ -14,4 +14,9 @@ public static class GameEvents
     /// 切换设置界面事件。
     /// </summary>
     public const string ToggleSettings = "ToggleSettings";
+    
+    /// <summary>
+    /// 金币数量发生变化事件。
+    /// </summary>
+    public const string GoldChanged = "GoldChanged";
 }
