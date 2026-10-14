@@ -118,6 +118,7 @@ public class Bootstrap : MonoBehaviour
         {
             testCube.SetActive(false);
         }
-        
+
+        _eventManager.PublishString(GameEvents.LoadScene, GameScenes.TestScene);
     }
 }

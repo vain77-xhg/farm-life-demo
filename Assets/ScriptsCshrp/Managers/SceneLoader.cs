@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -45,11 +46,32 @@ public class SceneLoader : MonoBehaviour
     // ==================== 场景加载 ====================
     
     /// <summary>
-    /// 加载指定名称的场景。
+    /// 请求加载指定场景。
+    /// 对外提供统一的场景加载入口。
     /// </summary>
     /// <param name="sceneName">需要加载的场景名称。</param>
     public void LoadScene(string sceneName)
     {
-        SceneManager.LoadScene(sceneName);
+        Debug.Log("收到场景加载请求：" + sceneName);
+        //启动并管理传进来的协程
+        StartCoroutine(LoadSceneAsync(sceneName));
+    }
+    
+    /// <summary>
+    /// 异步加载指定场景。
+    /// </summary>
+    /// <param name="sceneName">需要加载的场景名称。</param>
+    private IEnumerator LoadSceneAsync(string sceneName)// IEnumerator 一种“可以分段执行、可以暂停再继续”的方法返回类型。
+    {
+        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
+
+        while (!operation.isDone)
+        {
+            Debug.Log("场景加载进度：" + operation.progress);
+            
+            yield return null;
+        }
+        
+        Debug.Log("场景加载完成：" + operation.progress);
     }
 }

@@ -88,6 +88,11 @@ public class UIManager : MonoBehaviour
         if (_inventoryUI == null)
         {
             _inventoryUI = _resourceManager.InstantiatePrefab("UI/InventoryUI");
+                
+            if (_inventoryUI != null)
+            {
+                _inventoryUI.transform.SetParent(transform,false);
+            }
         }
 
         if (_inventoryUI != null)
@@ -134,10 +139,14 @@ public class UIManager : MonoBehaviour
         if (_settingsUI == null)
         {
             _settingsUI = _resourceManager.InstantiatePrefab("UI/SettingsUI");
+            if (_settingsUI != null)
+            {
+                _settingsUI.transform.SetParent(transform, false);
+            }
         }
         if (_settingsUI != null)
         {
-            _settingsUI.SetActive(true);
+            _settingsUI.SetActive(true); 
         }
     }
 
