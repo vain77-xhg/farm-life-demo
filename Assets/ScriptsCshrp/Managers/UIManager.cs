@@ -35,10 +35,10 @@ public class UIManager : MonoBehaviour
         }
 
         // 取消背包界面事件订阅
-        _eventManager.UnSubscribe(GameEvents.ToggleInventory, ToggleInventory);
+        _eventManager.Unsubscribe(GameEvents.ToggleInventory, ToggleInventory);
 
         // 取消设置界面事件订阅
-        _eventManager.UnSubscribe(GameEvents.ToggleSettings, ToggleSettings);
+        _eventManager.Unsubscribe(GameEvents.ToggleSettings, ToggleSettings);
     }
 
     // ==================== 初始化 ====================
