@@ -17,6 +17,7 @@ public class Bootstrap : MonoBehaviour
     private ResourceManager _resourceManager;
     private InPutManager _inputManager;
     private EventManager _eventManager;
+    private SceneLoader _sceneLoader;
 
     // ==================== Unity 生命周期 ====================
 
@@ -63,6 +64,9 @@ public class Bootstrap : MonoBehaviour
 
         // 创建EventManager
         _eventManager = CreateManager<EventManager>("EventManager");
+        
+        //创建SceneLoader
+        _sceneLoader = CreateManager<SceneLoader>("SceneLoader");
     }
 
     /// <summary>

@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// 事件管理器。
 /// 负责游戏事件的订阅、取消订阅和发布，
-/// 当前支持无参数事件和携带 int 参数的事件。
+/// 当前支持无参数事件、携带 int和string 参数的事件。
 /// </summary>
 public class EventManager : MonoBehaviour
 {
@@ -16,6 +16,9 @@ public class EventManager : MonoBehaviour
     
     // 保存携带 int 参数的事件
     private readonly Dictionary<string, Action<int>> _intEventTable = new Dictionary<string, Action<int>>();
+    
+    // 保存携带 string 参数的事件
+    private readonly Dictionary<string, Action<string>> _stringEventTable = new Dictionary<string, Action<string>>();
 
     // ==================== 事件订阅 ====================
 
@@ -56,7 +59,26 @@ public class EventManager : MonoBehaviour
         // 如果事件不存在，就创建新的事件记录
         _intEventTable.Add(eventName, callback);
     }
-    
+
+    /// <summary>
+    /// 订阅一个携带 string 参数的事件。
+    /// 如果事件已经存在，则追加新的回调方法；
+    /// 如果事件不存在，则创建新的事件记录。
+    /// </summary>
+    /// <param name="eventName">事件名称。</param>
+    /// <param name="callback">事件触发时需要执行的回调方法。</param>
+    public void SubscribeString(string eventName, Action<string> callback)
+    {
+        // 如果事件已经存在，就追加新的回调方法
+        if (_stringEventTable.ContainsKey(eventName))
+        {
+            _stringEventTable[eventName] += callback;
+            return;
+        }
+
+        // 如果事件不存在，就创建新的事件记录
+        _stringEventTable.Add(eventName, callback);
+    }
     // ==================== 取消订阅 ====================
     
     /// <summary>
@@ -105,6 +127,26 @@ public class EventManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 取消订阅一个携带 string 参数的事件。
+    /// 如果事件存在，则移除对应的回调方法。
+    /// 如果移除后已经没有任何回调方法，则删除该事件记录。
+    /// </summary>
+    /// <param name="eventName">事件名称。</param>
+    /// <param name="callback">需要取消订阅的回调方法。</param>
+    public void UnsubscribeString(string eventName, Action<string> callback)
+    {
+        if (!_stringEventTable.ContainsKey(eventName))
+        {
+            return;
+        }
+        _stringEventTable[eventName] -= callback;
+        
+        if (_stringEventTable[eventName] == null)
+        { 
+            _stringEventTable.Remove(eventName);
+        }
+    }
     // ==================== 事件发布 ====================
 
     /// <summary>
@@ -139,5 +181,22 @@ public class EventManager : MonoBehaviour
         }
         // 执行所有订阅方法，并把 value 传给它们
         _intEventTable[eventName]?.Invoke(value);
+    }
+    
+    /// <summary>
+    /// 发布一个携带 string 参数的事件。
+    /// 如果事件存在，则把指定的 string 数据传给所有订阅者。
+    /// </summary>
+    /// <param name="eventName">事件名称。</param>
+    /// <param name="value">随事件一起传递的 string 数据。</param>
+    public void PublishString(string eventName, string value)
+    {
+        // 如果事件不存在，就直接结束
+        if (!_stringEventTable.ContainsKey(eventName))
+        {
+            return;
+        }
+        // 执行所有订阅方法，并把 value 传给它们
+        _stringEventTable[eventName]?.Invoke(value);
     }
 }
