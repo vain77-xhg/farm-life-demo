@@ -77,6 +77,7 @@ public class Bootstrap : MonoBehaviour
     {
         _uiManager.Initialize(_resourceManager, _eventManager);
         _inputManager.Initialize(_eventManager);
+        _sceneLoader.Initialize(_eventManager);
     }
 
     /// <summary>
@@ -117,5 +118,6 @@ public class Bootstrap : MonoBehaviour
         {
             testCube.SetActive(false);
         }
+        
     }
 }

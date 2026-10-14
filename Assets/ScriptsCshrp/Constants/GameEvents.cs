@@ -19,4 +19,9 @@ public static class GameEvents
     /// 金币数量发生变化事件。
     /// </summary>
     public const string GoldChanged = "GoldChanged";
+    
+    /// <summary>
+    /// 请求加载指定场景事件。
+    /// </summary>
+    public const string LoadScene = "LoadScene";
 }
