@@ -11,6 +11,8 @@ public class SceneLoader : MonoBehaviour
     // ==================== 字段 ====================
 
     private EventManager _eventManager;
+
+    private bool _isloading = false;
     
     // ==================== Unity 生命周期 ====================
 
@@ -48,13 +50,27 @@ public class SceneLoader : MonoBehaviour
     /// <summary>
     /// 请求加载指定场景。
     /// 对外提供统一的场景加载入口。
+    /// 正在加载时忽略新的请求。
+    /// 目标场景不可加载时输出错误并结束请求。
     /// </summary>
     /// <param name="sceneName">需要加载的场景名称。</param>
     public void LoadScene(string sceneName)
     {
         Debug.Log("收到场景加载请求：" + sceneName);
+        if (_isloading)
+        {
+            return;
+        }
+        //判断指定场景是否能加载
+        if (!Application.CanStreamedLevelBeLoaded(sceneName))//返回的是bool，方法的作用是检查指定场景是否可以加载
+        {
+            Debug.LogError("无法加载场景，请检查场景名称和 Build Settings："+sceneName);
+            return;
+        }
+        _isloading = true;
         //启动并管理传进来的协程
         StartCoroutine(LoadSceneAsync(sceneName));
+        
     }
     
     /// <summary>
@@ -71,7 +87,7 @@ public class SceneLoader : MonoBehaviour
             
             yield return null;
         }
-        
+        _isloading = false;
         Debug.Log("场景加载完成：" + operation.progress);
     }
 }
