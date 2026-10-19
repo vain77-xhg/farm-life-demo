@@ -136,23 +136,35 @@ public class UIManager : MonoBehaviour
 
     /// <summary>
     /// 打开设置界面。
-    /// 首次打开时创建根对象、挂载脚本并初始化；
-    /// 之后复用已有对象，只恢复显示。
+    /// 首次打开时加载预制体并初始化，之后复用已有界面。
     /// </summary>
     public void OpenSettings()
     {
-        // 仅在首次打开时创建和初始化
         if (_settingsUI == null)
         {
-            _settingsUI = new GameObject("SettingsUI", typeof(RectTransform));
-            _settingsUI.transform.SetParent(transform, false);
-            
-            SettingsUI settingsUI = _settingsUI.AddComponent<SettingsUI>();
+            GameObject settingsObject = _resourceManager.InstantiatePrefab("UI/SettingsUI");
+
+            if (settingsObject == null)
+            {
+                return;
+            }
+
+            SettingsUI settingsUI = settingsObject.GetComponent<SettingsUI>();
+
+            if (settingsUI == null)
+            {
+                Debug.LogError("SettingsUI 预制体没有挂载 SettingsUI 脚本。");
+                Destroy(settingsObject);
+                return;
+            }
+
+            settingsObject.transform.SetParent(transform, false);
             settingsUI.Initialize(_eventManager);
+
+            _settingsUI = settingsObject;
         }
-        
-        // 首次打开或再次打开，都显示已有界面
-        _settingsUI.SetActive(true); 
+
+        _settingsUI.SetActive(true);
     }
 
     /// <summary>
