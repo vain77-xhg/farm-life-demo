@@ -39,6 +39,9 @@ public class UIManager : MonoBehaviour
 
         // 取消设置界面事件订阅
         _eventManager.Unsubscribe(GameEvents.ToggleSettings, ToggleSettings);
+        
+        // 取消关闭设置事件订阅
+        _eventManager.Unsubscribe(GameEvents.CloseSettings, CloseSettings);
     }
 
     // ==================== 初始化 ====================
@@ -59,6 +62,7 @@ public class UIManager : MonoBehaviour
         //订阅事件
         _eventManager.Subscribe(GameEvents.ToggleInventory, ToggleInventory);
         _eventManager.Subscribe(GameEvents.ToggleSettings, ToggleSettings);
+        _eventManager.Subscribe(GameEvents.CloseSettings, CloseSettings);
     }
 
     // ==================== 背包 UI ====================
@@ -144,7 +148,7 @@ public class UIManager : MonoBehaviour
             _settingsUI.transform.SetParent(transform, false);
             
             SettingsUI settingsUI = _settingsUI.AddComponent<SettingsUI>();
-            settingsUI.Initialize();
+            settingsUI.Initialize(_eventManager);
         }
         
         // 首次打开或再次打开，都显示已有界面

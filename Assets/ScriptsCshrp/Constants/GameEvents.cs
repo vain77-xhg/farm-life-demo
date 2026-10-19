@@ -24,4 +24,9 @@ public static class GameEvents
     /// 请求加载指定场景事件。
     /// </summary>
     public const string LoadScene = "LoadScene";
+    
+    /// <summary>
+    /// 请求关闭设置界面事件。
+    /// </summary>
+    public const string CloseSettings = "CloseSettings";
 }

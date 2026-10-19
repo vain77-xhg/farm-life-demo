@@ -1,9 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
 /// 设置界面组件。
-/// 通过代码创建 Canvas、背景面板和关闭按钮，按钮点击行为尚待绑定。
+/// 通过代码创建 Canvas、背景面板和关闭按钮，“通过事件系统请求关闭界面。
 /// </summary>
 public class SettingsUI : MonoBehaviour
 {
@@ -14,6 +15,9 @@ public class SettingsUI : MonoBehaviour
 
     // 保存背景面板对象，创建按钮时用它指定父对象
     private GameObject _settingsPanel;
+    
+    // 保存事件管理器引用，用于发布界面事件
+    private EventManager _eventManager;
 
     // ==================== 初始化 ====================
 
@@ -22,8 +26,12 @@ public class SettingsUI : MonoBehaviour
     /// 并依次创建背景面板和关闭按钮。
     /// 由 UIManager 在首次创建本组件后调用一次。
     /// </summary>
-    public void Initialize()
+    /// <param name="eventManager">用于发布界面事件的事件管理器引用。</param>
+    public void Initialize(EventManager eventManager)
     {
+        // 保存引用，供后续处理按钮点击时使用
+        _eventManager = eventManager;
+        
         // gameObject 指当前脚本所在的设置根对象；添加组件后保存其引用
         Canvas canvas = gameObject.AddComponent<Canvas>();
 
@@ -33,7 +41,7 @@ public class SettingsUI : MonoBehaviour
         // 让当前 Canvas 上的 UI 图形参与 EventSystem 的鼠标命中检测
         gameObject.AddComponent<GraphicRaycaster>();
 
-        // 按钮需要以背景面板为父对象，因此必须先创建面板
+        // 先创建面板，再创建它下面的按钮
         CreatePanel();
         CreateCloseButton();
     }
@@ -61,8 +69,8 @@ public class SettingsUI : MonoBehaviour
     }
 
     /// <summary>
-    /// 在背景面板下创建关闭按钮，配置尺寸和外观，
-    /// 并保存 Button 组件引用供后续绑定点击行为。
+    /// 在背景面板下创建关闭按钮，
+    /// 配置尺寸和外观，并绑定点击行为。
     /// </summary>
     private void CreateCloseButton()
     {
@@ -83,5 +91,43 @@ public class SettingsUI : MonoBehaviour
 
         // 指定按钮悬停、按下等状态变化时使用的图形
         _closeButton.targetGraphic = buttonImage;
+        
+        _closeButton.onClick.AddListener(OnCloseButtonClicked);
+        
+        CreateCloseButtonText();
+    }
+
+    /// <summary>
+    /// 在关闭按钮下创建文字对象，配置尺寸、字体和显示内容。
+    /// </summary>
+    private void CreateCloseButtonText()
+    {
+        GameObject textObject = new GameObject("CloseButtonText", typeof(RectTransform));
+        textObject.transform.SetParent(_closeButton.transform,false);
+        
+        RectTransform TextRect = textObject.GetComponent<RectTransform>();
+        TextRect.sizeDelta = new Vector2(120, 40);
+        
+        TextMeshProUGUI buttonText = textObject.AddComponent<TextMeshProUGUI>();
+        
+        buttonText.font = Resources.Load<TMP_FontAsset>("Fonts/SourceHanSansSC-Regular SDF");
+
+        buttonText.text = "关闭";
+        buttonText.fontSize = 24;
+        buttonText.color = Color.black;
+        buttonText.alignment = TextAlignmentOptions.Center;
+        
+        buttonText.raycastTarget = false;
+    }
+    
+    // ==================== 按钮行为 ====================
+
+    /// <summary>
+    /// 处理关闭按钮点击，发布关闭设置界面的请求。
+    /// </summary>
+
+    private void OnCloseButtonClicked()
+    {
+        _eventManager.Publish(GameEvents.CloseSettings);
     }
 }
