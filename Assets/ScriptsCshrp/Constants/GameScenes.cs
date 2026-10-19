@@ -14,4 +14,9 @@ public static class GameScenes
     /// 测试场景。
     /// </summary>
     public const string TestScene = "TestScene";
+    
+    /// <summary>
+    /// 农场场景。
+    /// </summary>
+    public const string FarmScene = "FarmScene";
 }
