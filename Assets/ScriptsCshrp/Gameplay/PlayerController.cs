@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
     
     // 玩家每秒移动的世界单位数。
     [SerializeField] private float _moveSpeed = 3f;
+        
+    [SerializeField] private float _runSpeed = 5f;
     
     // ==================== 初始化 ====================
 
@@ -46,14 +48,23 @@ public class PlayerController : MonoBehaviour
     // ==================== 玩家移动 ====================
 
     /// <summary>
-    /// 根据已读取的移动方向和移动速度更新玩家位置。
+    /// 根据当前方向和奔跑键状态选择速度，并更新玩家位置。
     /// </summary>
     private void Move()
     {
+        // 本次移动默认使用走路速度。
+        float currentSpeed = _moveSpeed;
+
+        // 按住奔跑键时，本次移动改用跑步速度。
+        if (_inputManager.IsRunPressed())
+        {
+            currentSpeed = _runSpeed;
+        }
+        
         // 将二维输入方向转换为世界坐标中的方向，Z 方向保持为零。
         Vector3 direction = new Vector3(_moveDirection.x,_moveDirection.y,0f);
         
         // 根据方向、速度和本帧时间计算位移，并更新玩家位置。
-        transform.position += direction.normalized * _moveSpeed * Time.deltaTime;
+        transform.position += direction.normalized * currentSpeed * Time.deltaTime;
     }
 }

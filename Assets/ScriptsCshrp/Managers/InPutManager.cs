@@ -72,4 +72,14 @@ public class InPutManager : MonoBehaviour
         
         return new Vector2(horizontal, vertical);
     }
+
+    /// <summary>
+    /// 检测玩家是否按住左 Shift 奔跑键。
+    /// </summary>
+    /// <returns>按住时返回 true，否则返回 false。</returns>
+    public bool IsRunPressed()
+    {
+        bool isRunPressed = Input.GetKey(KeyCode.LeftShift);
+        return isRunPressed;
+    }
 }
