@@ -103,6 +103,26 @@ public class Bootstrap : MonoBehaviour
         return manager;
     }
 
+    // ==================== 管理器访问 ====================
+
+    /// <summary>
+    /// 获取启动时已经创建的资源管理器。
+    /// </summary>
+    /// <returns>当前 Bootstrap 保存的资源管理器引用。</returns>
+    public ResourceManager GetResourceManager()
+    {
+        return _resourceManager;
+    }
+
+    /// <summary>
+    /// 获取启动时已经创建的输入管理器。
+    /// </summary>
+    /// <returns>当前 Bootstrap 保存的输入管理器引用。</returns>
+    public InPutManager GetInputManager()
+    {
+        return _inputManager;
+    }
+    
     // ==================== 游戏启动 ====================
 
     /// <summary>

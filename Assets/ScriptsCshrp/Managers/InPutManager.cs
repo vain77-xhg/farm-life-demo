@@ -58,4 +58,18 @@ public class InPutManager : MonoBehaviour
     {
         _eventManager = eventManager;
     }
+    
+    // ==================== 移动输入 ====================
+
+    /// <summary>
+    /// 读取 WASD 或方向键，返回当前的原始移动方向。
+    /// </summary>
+    /// <returns>横向和纵向组成的方向向量，无输入时为零向量。</returns>
+    public Vector2 GetMoveDirection()
+    {
+        float horizontal = Input.GetAxisRaw("Horizontal");
+        float vertical = Input.GetAxisRaw("Vertical");
+        
+        return new Vector2(horizontal, vertical);
+    }
 }
