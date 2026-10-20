@@ -3,24 +3,37 @@ using UnityEngine.UI;
 
 /// <summary>
 /// 设置界面组件。
-/// 使用预制体中配置的按钮，通过事件系统请求关闭界面。
+/// 使用预制体中绑定的按钮，向事件系统发布关闭设置界面的请求。
 /// </summary>
 public class SettingsUI : MonoBehaviour
 {
     // ==================== 字段 ====================
 
-    // 在预制体中绑定关闭按钮
+    // 预制体配置：在 SettingsUI 预制体中绑定关闭按钮。
     [SerializeField] private Button _closeButton;
-    
-    // 保存事件管理器引用，用于发布界面事件
+
+    // 运行时引用：由 UIManager 在创建界面实例后传入。
     private EventManager _eventManager;
+
+    // ==================== Unity 生命周期 ====================
+
+    /// <summary>
+    /// 组件销毁时移除本脚本添加的按钮监听。
+    /// </summary>
+    private void OnDestroy()
+    {
+        if (_closeButton != null)
+        {
+            _closeButton.onClick.RemoveListener(OnCloseButtonClicked);
+        }
+    }
 
     // ==================== 初始化 ====================
 
     /// <summary>
-    /// 保存事件管理器引用，并绑定关闭按钮的点击行为。
+    /// 保存事件管理器引用，检查预制体按钮配置，并绑定关闭按钮的点击回调。
     /// </summary>
-    /// <param name="eventManager">用于发布界面事件的事件管理器引用。</param>
+    /// <param name="eventManager">用于发布界面关闭请求的事件管理器。</param>
     public void Initialize(EventManager eventManager)
     {
         _eventManager = eventManager;
@@ -31,28 +44,15 @@ public class SettingsUI : MonoBehaviour
             return;
         }
 
-        // 先移除本方法已有的绑定，避免重复初始化时重复添加
+        // 先移除本回调，再重新添加，避免重复初始化造成重复监听。
         _closeButton.onClick.RemoveListener(OnCloseButtonClicked);
         _closeButton.onClick.AddListener(OnCloseButtonClicked);
     }
 
-    // ==================== Unity 生命周期 ====================
+    // ==================== 按钮事件响应 ====================
 
     /// <summary>
-    /// 组件销毁时，解除关闭按钮的点击绑定。
-    /// </summary>
-    private void OnDestroy()
-    {
-        if (_closeButton != null)
-        {
-            _closeButton.onClick.RemoveListener(OnCloseButtonClicked);
-        }
-    }
-
-    // ==================== 按钮行为 ====================
-
-    /// <summary>
-    /// 处理关闭按钮点击，发布关闭设置界面的请求。
+    /// 响应关闭按钮点击，发布 CloseSettings 请求，由 UIManager 隐藏界面。
     /// </summary>
     private void OnCloseButtonClicked()
     {
