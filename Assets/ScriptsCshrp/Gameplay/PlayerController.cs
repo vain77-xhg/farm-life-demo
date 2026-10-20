@@ -14,6 +14,8 @@ public class PlayerController : MonoBehaviour
         
     [SerializeField] private float _runSpeed = 5f;
     
+    private Rigidbody2D _rigidbody;
+    
     // ==================== 初始化 ====================
 
     /// <summary>
@@ -27,6 +29,14 @@ public class PlayerController : MonoBehaviour
     
     // ==================== Unity 生命周期 ====================
 
+    /// <summary>
+    /// 获取并缓存玩家自身的二维刚体组件。
+    /// </summary>
+    private void Awake()
+    {
+        _rigidbody = GetComponent<Rigidbody2D>();
+    }
+    
     /// <summary>
     /// 玩家实例开始运行时，输出启动日志。
     /// </summary>
@@ -42,11 +52,18 @@ public class PlayerController : MonoBehaviour
     {
         _moveDirection = _inputManager.GetMoveDirection();
         
-        Move();
     }
     
-    // ==================== 玩家移动 ====================
+    /// <summary>
+    /// 在每个物理时间步调用移动方法，设置玩家刚体速度。
+    /// </summary>
+    private void FixedUpdate()
+    {
+        Move();
+    }
 
+    // ==================== 玩家移动 ====================
+    
     /// <summary>
     /// 根据当前方向和奔跑键状态选择速度，并更新玩家位置。
     /// </summary>
@@ -61,10 +78,13 @@ public class PlayerController : MonoBehaviour
             currentSpeed = _runSpeed;
         }
         
-        // 将二维输入方向转换为世界坐标中的方向，Z 方向保持为零。
+        /*// 将二维输入方向转换为世界坐标中的方向，Z 方向保持为零。
         Vector3 direction = new Vector3(_moveDirection.x,_moveDirection.y,0f);
         
         // 根据方向、速度和本帧时间计算位移，并更新玩家位置。
-        transform.position += direction.normalized * currentSpeed * Time.deltaTime;
+        transform.position += direction.normalized * currentSpeed * Time.deltaTime;*/
+        
+        // 将方向与速度组合，交给刚体控制移动。(新版)
+        _rigidbody.velocity = _moveDirection.normalized * currentSpeed;
     }
 }
