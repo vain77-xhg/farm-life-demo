@@ -2,37 +2,37 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// 输入管理器。
-/// 发布界面切换事件，并提供移动、奔跑和交互输入的查询方法。
-/// 具体的玩家行为由 PlayerController 执行。
+/// 查询玩家输入，发布界面操作事件。
 /// </summary>
 public class InPutManager : MonoBehaviour
 {
     // ==================== 字段 ====================
 
-    // 由 Bootstrap 传入，用于发布界面事件。
+    // _eventManager：事件管理器组件，用于发布界面事件。
     private EventManager _eventManager;
 
     // ==================== Unity 生命周期 ====================
 
     /// <summary>
-    /// 每帧检测界面快捷键与鼠标点击。
-    /// Tab 和 Escape 发布界面切换事件，鼠标点击暂时输出所在区域的测试日志。
+    /// 检测界面快捷键和鼠标点击。
     /// </summary>
     void Update()
     {
+        // 第一步：按 Tab 时发布背包切换事件。
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             Debug.Log("检测到Tab按键按下");
             _eventManager.Publish(GameEvents.ToggleInventory);
         }
 
+        // 第二步：按 Escape 时发布设置切换事件。
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Debug.Log("检测到ESC键按下");
             _eventManager.Publish(GameEvents.ToggleSettings);
         }
 
+        // 第三步：点击鼠标时输出所在区域。
         if (Input.GetMouseButtonDown(0))
         {
             Debug.Log("检测到鼠标左键按下");
@@ -44,7 +44,6 @@ public class InPutManager : MonoBehaviour
             else
             {
                 Debug.Log("鼠标点击发生在UI外");
-                // 后续在此接入游戏世界的鼠标点击行为。
             }
         }
     }
@@ -52,47 +51,61 @@ public class InPutManager : MonoBehaviour
     // ==================== 初始化 ====================
 
     /// <summary>
-    /// 保存事件管理器引用，供界面快捷键发布事件。
+    /// 保存用于发布事件的事件管理器。
     /// </summary>
-    /// <param name="eventManager">Bootstrap 已经创建的事件管理器。</param>
+    /// <param name="eventManager">用于发布或订阅事件的事件管理器。</param>
     public void Initialize(EventManager eventManager)
     {
         _eventManager = eventManager;
     }
 
-    // ==================== 移动输入 ====================
+    // ==================== 对外接口 ====================
 
     /// <summary>
-    /// 读取 Horizontal 和 Vertical 输入轴，组成未经平滑处理的二维方向。
-    /// 具体按键由项目的 Input Manager 配置决定。
+    /// 读取横向和纵向输入，返回移动方向。
     /// </summary>
-    /// <returns>包含横向与纵向输入的向量；无输入时为零向量。</returns>
+    /// <returns>由横向和纵向输入组成的方向向量。</returns>
     public Vector2 GetMoveDirection()
     {
+        // 第一步：读取两个方向的输入值。
+        // horizontal：当前横向输入值。
         float horizontal = Input.GetAxisRaw("Horizontal");
+
+        // vertical：当前纵向输入值。
         float vertical = Input.GetAxisRaw("Vertical");
+
+        // 第二步：组合并返回二维方向。
         return new Vector2(horizontal, vertical);
     }
 
     /// <summary>
-    /// 查询左 Shift 奔跑键是否持续按住。
+    /// 查询左 Shift 是否被按住。
     /// </summary>
-    /// <returns>按住时返回 true，否则返回 false。</returns>
+    /// <returns>左 Shift 被按住时为 true。</returns>
     public bool IsRunPressed()
     {
+        // isRunPressed：左 Shift 是否处于按住状态。
         bool isRunPressed = Input.GetKey(KeyCode.LeftShift);
         return isRunPressed;
     }
 
-    // ==================== 交互输入 ====================
-
     /// <summary>
-    /// 查询当前帧是否刚按下 E 交互键，供玩家在 Update 中检测。
+    /// 查询本帧是否刚按下 E 键。
     /// </summary>
-    /// <returns>刚按下的这一帧返回 true，其余帧返回 false。</returns>
+    /// <returns>本帧刚按下 E 时为 true。</returns>
     public bool IsInteractPressed()
     {
+        // isInteractPressed：本帧是否刚按下 E 键。
         bool isInteractPressed = Input.GetKeyDown(KeyCode.E);
         return isInteractPressed;
     }
+
+    // ==================== 核心逻辑 ====================
+
+    // ==================== 事件响应 ====================
+
+    // ==================== 内部辅助 ====================
+
+    // ==================== 调试显示 ====================
+
 }

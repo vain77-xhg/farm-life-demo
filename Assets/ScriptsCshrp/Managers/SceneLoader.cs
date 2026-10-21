@@ -3,23 +3,22 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// 场景加载器。
-/// 响应场景加载事件，通过协程等待异步加载完成，并防止加载期间重复发起请求。
+/// 接收场景请求并异步加载目标场景。
 /// </summary>
 public class SceneLoader : MonoBehaviour
 {
     // ==================== 字段 ====================
 
-    // 由 Bootstrap 传入，用于订阅和取消订阅场景加载请求。
+    // _eventManager：事件管理器组件，用于订阅场景加载请求。
     private EventManager _eventManager;
 
-    // 当前是否正在加载场景，正常加载完成后恢复为 false。
+    // _isloading：是否正在加载场景，用于阻止重复加载。
     private bool _isloading = false;
 
     // ==================== Unity 生命周期 ====================
 
     /// <summary>
-    /// 组件销毁时取消场景加载事件订阅。
+    /// 取消场景加载事件的订阅。
     /// </summary>
     private void OnDestroy()
     {
@@ -34,24 +33,27 @@ public class SceneLoader : MonoBehaviour
     // ==================== 初始化 ====================
 
     /// <summary>
-    /// 保存事件管理器引用，并订阅带场景名称的加载请求。
+    /// 保存事件管理器并订阅场景加载请求。
     /// </summary>
-    /// <param name="eventManager">Bootstrap 已经创建的事件管理器。</param>
+    /// <param name="eventManager">用于发布或订阅事件的事件管理器。</param>
     public void Initialize(EventManager eventManager)
     {
+        // 第一步：保存事件管理器。
         _eventManager = eventManager;
+
+        // 第二步：订阅带场景名称的加载事件。
         _eventManager.SubscribeString(GameEvents.LoadScene, LoadScene);
     }
 
-    // ==================== 场景加载 ====================
+    // ==================== 对外接口 ====================
 
     /// <summary>
-    /// 检查请求后启动异步加载协程。
-    /// 正在加载时忽略新请求；目标场景不可加载时输出错误并结束本次请求。
+    /// 检查场景请求并启动加载协程。
     /// </summary>
-    /// <param name="sceneName">目标场景名称，需要已加入并启用在 Build Settings 中。</param>
+    /// <param name="sceneName">需要加载的场景名称。</param>
     public void LoadScene(string sceneName)
     {
+        // 第一步：记录请求，正在加载时结束。
         Debug.Log("收到场景加载请求：" + sceneName);
 
         if (_isloading)
@@ -59,36 +61,49 @@ public class SceneLoader : MonoBehaviour
             return;
         }
 
-        // 在设置加载状态之前检查场景，避免无效请求占用加载状态。
+        // 第二步：确认目标场景可以加载。
         if (!Application.CanStreamedLevelBeLoaded(sceneName))
         {
             Debug.LogError("无法加载场景，请检查场景名称和 Build Settings：" + sceneName);
             return;
         }
 
+        // 第三步：标记加载状态，启动协程。
         _isloading = true;
         StartCoroutine(LoadSceneAsync(sceneName));
     }
 
+    // ==================== 核心逻辑 ====================
+
     /// <summary>
-    /// 发起异步场景加载，在等待期间逐帧输出进度。
-    /// 加载完成后解除加载状态，并输出完成日志。
+    /// 等待异步加载完成并恢复加载状态。
     /// </summary>
     /// <param name="sceneName">需要加载的场景名称。</param>
-    /// <returns>交给 StartCoroutine 执行的协程迭代器。</returns>
+    /// <returns>供 StartCoroutine 执行的协程迭代器。</returns>
     private IEnumerator LoadSceneAsync(string sceneName)
     {
+        // 第一步：启动异步场景加载。
+        // operation：保存场景加载进度和完成状态的异步操作。
         AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
 
+        // 第二步：加载期间逐帧输出进度。
         while (!operation.isDone)
         {
             Debug.Log("场景加载进度：" + operation.progress);
 
-            // 暂停当前协程，下一帧继续检查；游戏的其他逻辑仍可运行。
+            // 暂停当前协程，下一帧继续检查。
             yield return null;
         }
 
+        // 第三步：加载完成后解除加载状态。
         _isloading = false;
         Debug.Log("场景加载完成：" + operation.progress);
     }
+
+    // ==================== 事件响应 ====================
+
+    // ==================== 内部辅助 ====================
+
+    // ==================== 调试显示 ====================
+
 }

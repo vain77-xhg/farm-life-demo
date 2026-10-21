@@ -1,13 +1,14 @@
 using UnityEngine;
 
 /// <summary>
-/// 可交互物体组件。
-/// 挂载在需要响应玩家交互的物体上，由 PlayerController 查找并调用。
-/// 当前使用日志反馈交互结果，后续再接入具体行为。
+/// 响应玩家交互，输出配置的提示文字。
 /// </summary>
 public class InteractableObject : MonoBehaviour
 {
     // ==================== 字段 ====================
+
+    // _interactionMessage：当前物体被交互时输出的提示文字。
+    [SerializeField] private string _interactionMessage = "欢迎来到农场！";
 
     // ==================== Unity 生命周期 ====================
 
@@ -15,19 +16,20 @@ public class InteractableObject : MonoBehaviour
 
     // ==================== 对外接口 ====================
 
-    // ==================== 交互 ====================
-
     /// <summary>
-    /// 响应一次交互请求，输出当前组件所在物体名称的测试日志。
+    /// 输出当前物体配置的交互提示。
     /// </summary>
     public void Interact()
     {
-        // gameObject 指挂载当前组件的目标物体。
-        Debug.Log("与物体交互：" + gameObject.name);
+        Debug.Log(_interactionMessage);
     }
+
+    // ==================== 核心逻辑 ====================
 
     // ==================== 事件响应 ====================
 
     // ==================== 内部辅助 ====================
+
+    // ==================== 调试显示 ====================
 
 }

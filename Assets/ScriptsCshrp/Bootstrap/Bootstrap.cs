@@ -1,53 +1,64 @@
 using UnityEngine;
 
 /// <summary>
-/// 游戏启动入口。
-/// 保留唯一的 Bootstrap，创建并初始化管理器，然后进入农场场景。
+/// 创建并初始化游戏管理器，启动游戏。
 /// </summary>
 public class Bootstrap : MonoBehaviour
 {
     // ==================== 字段 ====================
 
     /// <summary>
-    /// 当前有效的 Bootstrap 实例，供场景入口访问已经创建的管理器。
+    /// Instance：当前唯一的游戏启动入口。
     /// </summary>
     public static Bootstrap Instance;
 
-    // 运行时创建的管理器组件，所在对象均为 Bootstrap 的子对象。
+    // _uiManager：界面管理器组件，控制背包和设置界面。
     private UIManager _uiManager;
+
+    // _resourceManager：资源管理器组件，加载和创建预制体。
     private ResourceManager _resourceManager;
+
+    // _inputManager：输入管理器组件，查询输入和发布界面事件。
     private InPutManager _inputManager;
+
+    // _eventManager：事件管理器组件，保存和调用事件回调。
     private EventManager _eventManager;
+
+    // _sceneLoader：场景加载器组件，处理场景切换。
     private SceneLoader _sceneLoader;
 
     // ==================== Unity 生命周期 ====================
 
     /// <summary>
-    /// 阻止重复的启动入口，将当前对象及其子对象跨场景保留。
-    /// 随后依次创建管理器、传入依赖并执行游戏启动流程。
+    /// 保留唯一启动入口，初始化管理器并启动游戏。
     /// </summary>
     void Awake()
     {
+        // 第一步：检查入口，重复时销毁。
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
             return;
         }
 
+        // 第二步：保存当前入口，跨场景保留对象。
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
         Debug.Log("Bootstrap 启动");
+
+        // 第三步：创建管理器，再传入依赖。
         CreateManagers();
         InitializeManagers();
+
+        // 第四步：执行游戏启动流程。
         StartGame();
     }
 
     // ==================== 初始化 ====================
 
     /// <summary>
-    /// 依次创建资源、界面、输入、事件和场景加载管理器，保存组件引用。
-    /// 所有管理器创建完成后，再统一传入它们需要的依赖。
+    /// 创建各管理器并保存组件引用。
     /// </summary>
     private void CreateManagers()
     {
@@ -59,8 +70,7 @@ public class Bootstrap : MonoBehaviour
     }
 
     /// <summary>
-    /// 为界面管理器传入资源和事件管理器，为输入管理器及场景加载器传入事件管理器。
-    /// 各组件在自己的 Initialize 方法中保存引用并完成相应的事件订阅。
+    /// 向各管理器传入需要的依赖。
     /// </summary>
     private void InitializeManagers()
     {
@@ -69,57 +79,73 @@ public class Bootstrap : MonoBehaviour
         _sceneLoader.Initialize(_eventManager);
     }
 
-    // ==================== 管理器访问 ====================
+    // ==================== 对外接口 ====================
 
     /// <summary>
-    /// 获取启动时已经创建的资源管理器。
+    /// 获取已有的资源管理器。
     /// </summary>
-    /// <returns>当前 Bootstrap 保存的资源管理器引用。</returns>
+    /// <returns>启动时创建的资源管理器组件。</returns>
     public ResourceManager GetResourceManager()
     {
         return _resourceManager;
     }
 
     /// <summary>
-    /// 获取启动时已经创建的输入管理器。
+    /// 获取已有的输入管理器。
     /// </summary>
-    /// <returns>当前 Bootstrap 保存的输入管理器引用。</returns>
+    /// <returns>启动时创建的输入管理器组件。</returns>
     public InPutManager GetInputManager()
     {
         return _inputManager;
     }
 
-    // ==================== 游戏启动 ====================
+    // ==================== 核心逻辑 ====================
 
     /// <summary>
-    /// 执行当前的启动测试流程：打开背包，创建并隐藏测试方块，最后发布农场场景加载请求。
+    /// 执行背包、方块和场景切换的启动测试。
     /// </summary>
     private void StartGame()
     {
+        // 第一步：打开背包。
         _uiManager.OpenInventory();
 
+        // 第二步：创建测试方块，成功后隐藏。
+        // testCube：启动测试时创建的方块实例。
         GameObject testCube = _resourceManager.InstantiatePrefab("prefabs/TestCube");
         if (testCube != null)
         {
             testCube.SetActive(false);
         }
 
+        // 第三步：发布农场场景加载请求。
         _eventManager.PublishString(GameEvents.LoadScene, GameScenes.FarmScene);
     }
+
+    // ==================== 事件响应 ====================
 
     // ==================== 内部辅助 ====================
 
     /// <summary>
-    /// 创建管理器对象，将其放在 Bootstrap 层级下，再添加指定类型的组件。
+    /// 创建管理器子对象并返回添加的组件。
     /// </summary>
-    /// <typeparam name="T">需要创建的组件类型。</typeparam>
-    /// <param name="objectName">管理器 GameObject 的名称。</param>
+    /// <param name="objectName">新建管理器对象的名称。</param>
+    /// <typeparam name="T">需要添加的管理器组件类型。</typeparam>
     /// <returns>新对象上添加的管理器组件。</returns>
     private T CreateManager<T>(string objectName) where T : Component
     {
+        // 第一步：创建管理器对象。
+        // managerObject：新创建的管理器 GameObject。
         GameObject managerObject = new GameObject(objectName);
+
+        // 第二步：设置 Bootstrap 为父对象。
         managerObject.transform.SetParent(transform);
+
+        // 第三步：添加组件并返回。
+        // manager：添加到新对象上的管理器组件。
         T manager = managerObject.AddComponent<T>();
         return manager;
     }
+
+    // ==================== 调试显示 ====================
+
 }

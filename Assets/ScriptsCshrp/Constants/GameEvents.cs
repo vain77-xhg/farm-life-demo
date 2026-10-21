@@ -1,38 +1,47 @@
 /// <summary>
-/// 游戏事件名称集合。
-/// 发布与订阅时共用这些常量，避免在不同脚本中重复手写事件名称。
+/// 保存发布和订阅时使用的事件名称。
 /// </summary>
 public static class GameEvents
 {
-    // ==================== 界面事件 ====================
+    // ==================== 字段 ====================
 
     /// <summary>
-    /// 切换背包界面的显示状态，无参数。
+    /// ToggleInventory：切换背包界面的事件名称，无参数。
     /// </summary>
     public const string ToggleInventory = "ToggleInventory";
 
     /// <summary>
-    /// 切换设置界面的显示状态，无参数。
+    /// ToggleSettings：切换设置界面的事件名称，无参数。
     /// </summary>
     public const string ToggleSettings = "ToggleSettings";
 
     /// <summary>
-    /// 请求关闭设置界面，无参数。
+    /// CloseSettings：关闭设置界面的事件名称，无参数。
     /// </summary>
     public const string CloseSettings = "CloseSettings";
 
-    // ==================== 场景事件 ====================
-
     /// <summary>
-    /// 请求加载场景，使用 string 参数传递目标场景名称。
+    /// LoadScene：加载场景的事件名称，使用 string 传递场景名。
     /// </summary>
     public const string LoadScene = "LoadScene";
 
-    // ==================== 预留数据事件 ====================
-
     /// <summary>
-    /// 预留的金币变化事件，计划使用 int 参数传递金币数量。
-    /// 当前尚未接入发布与订阅流程。
+    /// GoldChanged：预留的金币变化事件名称，计划传递 int 数据。
     /// </summary>
     public const string GoldChanged = "GoldChanged";
+
+    // ==================== Unity 生命周期 ====================
+
+    // ==================== 初始化 ====================
+
+    // ==================== 对外接口 ====================
+
+    // ==================== 核心逻辑 ====================
+
+    // ==================== 事件响应 ====================
+
+    // ==================== 内部辅助 ====================
+
+    // ==================== 调试显示 ====================
+
 }
