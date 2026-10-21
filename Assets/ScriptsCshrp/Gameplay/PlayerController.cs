@@ -2,8 +2,8 @@ using UnityEngine;
 
 /// <summary>
 /// 玩家控制组件。
-/// 读取输入，通过二维刚体控制走路和跑步，并响应交互请求。
-/// 当前交互入口仅输出测试日志。
+/// 读取输入，通过二维刚体控制走路和跑步，并检测附近可交互物体。
+/// 按下交互键后调用目标组件的 Interact，当前目标通过日志反馈交互结果。
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
@@ -12,6 +12,9 @@ public class PlayerController : MonoBehaviour
     // Inspector 配置：走路与跑步时每秒移动的世界单位数。
     [SerializeField] private float _moveSpeed = 3f;
     [SerializeField] private float _runSpeed = 5f;
+
+    // Inspector 配置：以玩家为中心的交互检测半径。
+    [SerializeField] private float _interactRadius = 1.5f;
 
     // 运行时状态：Update 读取的原始输入方向，在 Inspector 中便于观察。
     [SerializeField] private Vector2 _moveDirection;
@@ -93,11 +96,28 @@ public class PlayerController : MonoBehaviour
     // ==================== 玩家交互 ====================
 
     /// <summary>
-    /// 响应交互请求，输出当前测试日志。
-    /// 后续在此入口接入交互目标检测。
+    /// 检测玩家附近的二维碰撞体，输出检测数量，
+    /// 并与遍历时找到的第一个可交互物体执行一次交互。
     /// </summary>
     private void TryInteract()
     {
-        Debug.Log("玩家尝试交互");
+        // 以玩家为圆心查询附近的碰撞体，结果中也可能包含玩家自身。
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, _interactRadius);
+        Debug.Log("检测到的碰撞体数量：" + colliders.Length);
+
+        // 逐个检查检测结果，从碰撞体所在的同一个 GameObject 上获取交互组件。
+        foreach (Collider2D collider in colliders)
+        {
+            InteractableObject interactableObject = collider.GetComponent<InteractableObject>();
+
+            // 找到交互组件才调用；没有组件时，循环会继续检查下一个碰撞体。
+            if (interactableObject != null)
+            {
+                interactableObject.Interact();
+
+                // 结束整个方法，使一次按键只交互一个物体；当前不按距离选择目标。
+                return;
+            }
+        }
     }
 }
