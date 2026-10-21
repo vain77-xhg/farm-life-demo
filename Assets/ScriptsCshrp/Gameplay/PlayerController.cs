@@ -120,4 +120,15 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+    
+    // =================== 调试显示 =======================
+    
+    /// <summary>
+    /// 选中玩家时，绘制交互检测范围，方便观察和调整半径。
+    /// </summary>
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, _interactRadius);
+    }
 }
