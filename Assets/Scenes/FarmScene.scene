@@ -409,7 +409,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2d4847119d799e42ad2a357aa5e6ee1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interactionMessage: "\u524D\u65B9\u662F\u519C\u7530\uFF0C\u8BF7\u7231\u62A4\u4F5C\u7269\u3002"
+  _textId: 300001
 --- !u!1 &1332269608
 GameObject:
   m_ObjectHideFlags: 0
@@ -457,7 +457,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2d4847119d799e42ad2a357aa5e6ee1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interactionMessage: "\u8FD9\u91CC\u662F\u519C\u573A\u5165\u53E3\uFF0C\u6B22\u8FCE\u56DE\u6765\uFF01"
+  _textId: 300002
 --- !u!61 &1332269611
 BoxCollider2D:
   m_ObjectHideFlags: 0

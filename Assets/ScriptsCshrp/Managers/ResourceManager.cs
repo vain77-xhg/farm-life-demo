@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 从 Resources 加载预制体并创建实例。
+/// 从 Resources 加载预制体和文本资源，并创建预制体实例。
 /// </summary>
 public class ResourceManager : MonoBehaviour
 {
@@ -63,6 +63,29 @@ public class ResourceManager : MonoBehaviour
         // instance：通过预制体创建的新实例。
         GameObject instance = Instantiate(prefab);
         return instance;
+    }
+    
+    /// <summary>
+    /// 加载指定路径的文本资源。
+    /// </summary>
+    /// <param name="path">Resources 下的文本资源路径，不含扩展名。</param>
+    /// <returns>加载到的文本资源，失败时为空。</returns>
+    public TextAsset LoadTextAsset(string path)
+    {
+        // 第一步：加载文本资源。
+        // textAsset：加载到的文本资源。
+        TextAsset textAsset = Resources.Load<TextAsset>(path);
+
+        // 第二步：加载失败时返回空值。
+        if (textAsset == null)
+        {
+            Debug.Log("Text 加载失败：" + path);
+            return null;
+        }
+
+        // 第三步：输出成功日志并返回资源。
+        Debug.Log("Text 加载成功：" + path);
+        return textAsset;
     }
 
     // ==================== 核心逻辑 ====================

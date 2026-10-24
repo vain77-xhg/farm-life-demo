@@ -7,8 +7,8 @@ public class InteractableObject : MonoBehaviour
 {
     // ==================== 字段 ====================
 
-    // _interactionMessage：当前物体被交互时输出的提示文字。
-    [SerializeField] private string _interactionMessage = "欢迎来到农场！";
+    // _textId：当前物体交互时使用的文本编号。
+    [SerializeField] private int _textId;
 
     // ==================== Unity 生命周期 ====================
 
@@ -17,11 +17,23 @@ public class InteractableObject : MonoBehaviour
     // ==================== 对外接口 ====================
 
     /// <summary>
-    /// 输出当前物体配置的交互提示。
+    /// 查询并输出当前物体的交互提示。
     /// </summary>
     public void Interact()
     {
-        Debug.Log(_interactionMessage);
+        // textManager：启动时创建的文本管理器。
+        TextManager textManager = Bootstrap.Instance.GetTextManager();
+        
+        // text：当前物体对应的交互提示文字。
+        string text = textManager.GetText(_textId);
+        
+        // 没有取得文字时，结束本次交互。
+        if (string.IsNullOrEmpty(text))
+        {
+            return;
+        }
+        
+        Debug.Log(text);
     }
 
     // ==================== 核心逻辑 ====================

@@ -15,7 +15,7 @@ public class Bootstrap : MonoBehaviour
     // _uiManager：界面管理器组件，控制背包和设置界面。
     private UIManager _uiManager;
 
-    // _resourceManager：资源管理器组件，加载和创建预制体。
+    // _resourceManager：资源管理器，加载预制体和文本资源，并创建预制体实例。
     private ResourceManager _resourceManager;
 
     // _inputManager：输入管理器组件，查询输入和发布界面事件。
@@ -26,6 +26,9 @@ public class Bootstrap : MonoBehaviour
 
     // _sceneLoader：场景加载器组件，处理场景切换。
     private SceneLoader _sceneLoader;
+    
+    // _textManager：文本管理器，读取文本表并按编号提供文字。
+    private TextManager _textManager;
 
     // ==================== Unity 生命周期 ====================
 
@@ -67,6 +70,7 @@ public class Bootstrap : MonoBehaviour
         _inputManager = CreateManager<InPutManager>("InputManager");
         _eventManager = CreateManager<EventManager>("EventManager");
         _sceneLoader = CreateManager<SceneLoader>("SceneLoader");
+        _textManager=CreateManager<TextManager>("TextManager");
     }
 
     /// <summary>
@@ -77,6 +81,7 @@ public class Bootstrap : MonoBehaviour
         _uiManager.Initialize(_resourceManager, _eventManager);
         _inputManager.Initialize(_eventManager);
         _sceneLoader.Initialize(_eventManager);
+        _textManager.Initialize(_resourceManager);
     }
 
     // ==================== 对外接口 ====================
@@ -99,6 +104,14 @@ public class Bootstrap : MonoBehaviour
         return _inputManager;
     }
 
+    /// <summary>
+    /// 获取已有的文本管理器
+    /// </summary>
+    /// <returns>启动时创建的文本管理器</returns>
+    public TextManager GetTextManager()
+    {
+        return _textManager;
+    }
     // ==================== 核心逻辑 ====================
 
     /// <summary>
