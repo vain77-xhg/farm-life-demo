@@ -63,15 +63,17 @@ public class TextManager : MonoBehaviour
             // 第二步：清除旧记录，并拆分文本行。
             _texts.Clear();
 
-            // lines：保存文本表的各行。
-            string[] lines = textAsset.text.Split('\n');
+            // lines：保存文本表的每一行。
+            string[] lines = textAsset.text.Split('\n');    //Split('\n')：遇到换行符就拆分。
 
             // 第三步：跳过表头，检查并保存每条文本。
             // i：当前读取的行下标。
             for (int i = 1; i < lines.Length; i++)
             {
                 // line：去掉末尾回车符的当前行。
-                string line = lines[i].TrimEnd('\r');
+                string line = lines[i].TrimEnd('\r');   //TrimEnd('\r')：去掉字符串末尾的回车符。
+                
+                //这一行没有有效内容就跳过，读取下一行。
                 if (string.IsNullOrWhiteSpace(line))
                 {
                     continue;
