@@ -49,12 +49,16 @@
 - 从 `SampleScene` 启动；菜单“工具/打开启动场景”可快速打开它。`FarmScene` 单独运行没有 Bootstrap。
 - 玩家预制体保存的交互半径为 0.8，已确认手感合适。不要因脚本默认值为 1.5 而重置预制体。
 - 文本 ID 采用 int 数字编号，通过六/七/八位及号段分类，完整分配见主文档；九位暂留。用户源表为 `Docs/DataTables/文本表.xlsx`，按号段分工作表；原 `Texts.xlsx` 已不使用，不要恢复旧文件。
-- 已接通 Excel 手动导出 UTF-8 CSV → `ResourceManager.LoadTextAsset()` → `TextManager` 解析并保存字典 → `InteractableObject` 按 `_textId` 查询 → Console 输出。运行时文件是 `Assets/Resources/Data/文本表.csv`，Resources 加载路径是 `Data/文本表`。
+- 已接通 Excel 手动导出 UTF-8 CSV → ResourceManager 加载 → TextManager 解析与查询 → InteractableObject 发布显示事件 → UIManager 创建/复用界面 → InteractionUI 更新文字。运行时文件是 `Assets/Resources/Data/文本表.csv`，加载路径为 `Data/文本表`；显示请求携带已查询的 string 文字，不把文本 ID 当显示内容。
 - 当前解析器 `ParseCsvline()` 支持单行记录中的引号内逗号和转义双引号；检查列数、整数编号、重复编号及引号未闭合。用户决定暂不支持单元格内实际换行；不要自行扩展为多行 CSV 解析器。
-- 文本表加载成功后清空旧字典再填充；缺失编号报错并返回空字符串，交互收到空文字时结束。逐条加载测试日志已移除，保留数量和错误日志。农场测试物体已改用 300001、300002；尚未接入游戏内文字 UI。
-- 文本模块已由用户保存 Git。本轮新增 `GameStateManager`，由 Bootstrap 创建并提供已有引用；FarmSceneController 将输入和状态管理器传给玩家，Bootstrap 将资源、事件和状态管理器传给 UIManager。查询和设置方法分别是 `CanPlayerControl()`、`SetPlayerControl(bool)`，默认允许操作。
+- 文本表加载成功后清空旧字典再填充；缺失编号报错并返回空字符串，交互收到空文字时结束。逐条加载测试日志已移除，保留数量和错误日志。农场测试物体使用 300001、300002，交互结果已接入游戏内提示界面。
+- 文本基础和设置面板操作权限模块已由用户保存 Git。GameStateManager 由 Bootstrap 创建并提供已有引用；FarmSceneController 将输入和状态管理器传给玩家，Bootstrap 将资源、事件和状态管理器传给 UIManager。查询/设置方法分别为 `CanPlayerControl()`、`SetPlayerControl(bool)`，默认允许操作。
 - 已接通设置面板操作权限：UIManager 显示设置成功后设为 false，隐藏后设为 true；PlayerController 在 Update 禁止时清除方向并跳过移动输入/E 键，在 Move 禁止时清零刚体速度并返回。ESC 和关闭按钮均能恢复操作，界面输入继续处理。
-- 用户反馈临时禁用/恢复测试与设置开关联动测试通过；临时禁用代码已删除。助手完成代码和注释核对，没有独立运行 Unity 或编译工程。本轮整理只改注释、空白排版和项目记录，保留所有执行逻辑与八个分区，Git 仍由用户操作。
+- 用户反馈设置面板权限联动和交互提示显示测试通过；本轮新增了自动隐藏与连续交互重新计时，用户也反馈验证通过。助手只做保存代码、资源引用及差异检查，没有独立运行 Unity 或编译工程；整理注释排版时须保持执行逻辑和八个分区一致。
 - 当前限制仅由设置面板控制；背包开关尚未接入，世界时间/物理世界暂停、多来源操作限制尚未实现，不把当前 bool 方案直接推广成“关闭任意界面就恢复全部权限”。当前仍在第一阶段，时间、物品/背包数据与存档等模块继续待实现。
-- 下一建议小模块为交互文字 UI：先讲清数据流与预制体结构，再由用户分步实现文本 ID 查询结果的游戏内显示；当前仍输出 Console，未开始新功能。具体安排以用户最新决定为准。
+- 交互提示预制体为 `Assets/Resources/UI/InteractionUI.prefab`，层级 `InteractionUI → Panel → ContentText`；文字按用户选择水平/垂直居中。根组件 `InteractionUI` 用 `[SerializeField] TMP_Text _contentText` 绑定已有文字组件，`SetText(string)` 仅更新文字；加载、显示和隐藏由 UIManager 管理。
+- `GameEvents.ShowInteractionText` 通过 string 携带文字；UIManager.Initialize 订阅，OnDestroy 配套取消订阅。Bootstrap.GetEventManager 返回已有引用；InteractableObject 在 Interact 方法内获取管理器，不在字段初始化时访问 Bootstrap.Instance。临时启动显示测试已删除。
+- UIManager 使用 `_interactionDisplayDuration = 3f` 和 `_interactionHideCoroutine`；每次显示先停止旧协程，再启动 HideInteractionTextAfterDelay，使用 WaitForSecondsRealtime 等待约 3 个现实秒后隐藏并清空引用。提示为非模态显示，不修改玩家操作权限；隐藏保留实例，后续交互复用。
+- 本轮字体差异新增了“交互提示预览”等字符的字形和图集数据，与预制体文字预览相符，建议与本模块一同提交；后续仍按实际 diff 判断，不一概还原 TMP 字体资源。
+- 当前准备由用户手动提交交互提示 UI 模块。下一建议模块是游戏时间与日期：先讨论现实时间与游戏时间的推进比例、日期和暂停规则，再由用户分步编写；当前尚未创建时间模块。具体安排以用户最新决定为准。
 - 阶段、优先级或合作方式改变时，同步维护主文档和相关入口。

@@ -1,7 +1,8 @@
 using UnityEngine;
+using System.Collections;
 
 /// <summary>
-/// 管理界面显示，并在设置开关时更新玩家操作权限。
+/// 管理界面显示与交互提示计时，更新玩家操作权限。
 /// </summary>
 public class UIManager : MonoBehaviour
 {
@@ -21,6 +22,15 @@ public class UIManager : MonoBehaviour
 
     // _gameStateManager：用于在设置开关时修改玩家操作权限。
     private GameStateManager _gameStateManager;
+
+    // _interactionUI：已创建的交互提示界面组件，用于更新文字并复用界面。
+    private InteractionUI _interactionUI;
+
+    // _interactionDisplayDuration：每次交互后提示保留的现实秒数。
+    [SerializeField] private float _interactionDisplayDuration = 3f;
+
+    // _interactionHideCoroutine：当前隐藏计时的协程引用，用于停止旧计时。
+    private Coroutine _interactionHideCoroutine;
 
     // ==================== Unity 生命周期 ====================
 
@@ -45,6 +55,7 @@ public class UIManager : MonoBehaviour
         _eventManager.Unsubscribe(GameEvents.ToggleInventory, ToggleInventory);
         _eventManager.Unsubscribe(GameEvents.ToggleSettings, ToggleSettings);
         _eventManager.Unsubscribe(GameEvents.CloseSettings, CloseSettings);
+        _eventManager.UnsubscribeString(GameEvents.ShowInteractionText, ShowInteractionText);
     }
 
     // ==================== 初始化 ====================
@@ -66,10 +77,11 @@ public class UIManager : MonoBehaviour
         _gameStateManager = gameStateManager;
         Debug.Log("UIManager 已经接收到 ResourceManager");
 
-        // 第二步：订阅背包和设置界面的操作事件。
+        // 第二步：订阅背包、设置和交互提示的界面事件。
         _eventManager.Subscribe(GameEvents.ToggleInventory, ToggleInventory);
         _eventManager.Subscribe(GameEvents.ToggleSettings, ToggleSettings);
         _eventManager.Subscribe(GameEvents.CloseSettings, CloseSettings);
+        _eventManager.SubscribeString(GameEvents.ShowInteractionText, ShowInteractionText);
     }
 
     // ==================== 对外接口 ====================
@@ -177,7 +189,75 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 创建或复用交互提示，更新文字并重新计时隐藏。
+    /// </summary>
+    /// <param name="text">需要显示的交互提示文字。</param>
+    public void ShowInteractionText(string text)
+    {
+        // 第一步：首次显示时创建界面。
+        if (_interactionUI == null)
+        {
+            // interactionObject：新创建的交互提示界面实例。
+            GameObject interactionObject =
+                _resourceManager.InstantiatePrefab("UI/InteractionUI");
+
+            if (interactionObject == null)
+            {
+                return;
+            }
+
+            // 第二步：获取并检查文字控制组件。
+            // interactionUI：界面实例上的文字控制组件。
+            InteractionUI interactionUI =
+                interactionObject.GetComponent<InteractionUI>();
+            if (interactionUI == null)
+            {
+                Debug.LogError("InteractionUI 预制体没有挂载 InteractionUI 脚本。");
+                Destroy(interactionObject);
+                return;
+            }
+
+            // 第三步：设置父对象，并保存组件引用。
+            interactionObject.transform.SetParent(transform, false);
+            _interactionUI = interactionUI;
+        }
+
+        // 第四步：更新文字，并显示界面。
+        _interactionUI.SetText(text);
+        _interactionUI.gameObject.SetActive(true);
+
+        // 第五步：停止上一次等待，避免旧计时提前隐藏新提示。
+        if (_interactionHideCoroutine != null)
+        {
+            StopCoroutine(_interactionHideCoroutine);
+        }
+
+        // 第六步：启动新的等待，并保存协程引用。
+        _interactionHideCoroutine =
+            StartCoroutine(HideInteractionTextAfterDelay());
+    }
+
     // ==================== 核心逻辑 ====================
+
+    /// <summary>
+    /// 按现实时间等待后隐藏提示，并清除协程引用。
+    /// </summary>
+    /// <returns>供 StartCoroutine 执行的协程迭代器。</returns>
+    private IEnumerator HideInteractionTextAfterDelay()
+    {
+        // 第一步：按现实经过的时间等待。
+        yield return new WaitForSecondsRealtime(_interactionDisplayDuration);
+
+        // 第二步：界面仍存在时，将它隐藏。
+        if (_interactionUI != null)
+        {
+            _interactionUI.gameObject.SetActive(false);
+        }
+
+        // 第三步：清除已经完成的协程引用。
+        _interactionHideCoroutine = null;
+    }
 
     // ==================== 事件响应 ====================
 

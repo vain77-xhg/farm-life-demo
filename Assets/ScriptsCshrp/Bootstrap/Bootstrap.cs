@@ -126,6 +126,15 @@ public class Bootstrap : MonoBehaviour
         return _gameStateManager;
     }
 
+    /// <summary>
+    /// 获取已有的事件管理器。
+    /// </summary>
+    /// <returns>启动时创建的事件管理器组件。</returns>
+    public EventManager GetEventManager()
+    {
+        return _eventManager;
+    }
+
     // ==================== 核心逻辑 ====================
 
     /// <summary>

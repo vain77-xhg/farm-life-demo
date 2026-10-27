@@ -26,6 +26,11 @@ public static class GameEvents
     public const string LoadScene = "LoadScene";
 
     /// <summary>
+    /// ShowInteractionText：请求显示交互提示，使用 string 传递已查询的文字。
+    /// </summary>
+    public const string ShowInteractionText = "ShowInteractionText";
+
+    /// <summary>
     /// GoldChanged：预留的金币变化事件名称，计划传递 int 数据。
     /// </summary>
     public const string GoldChanged = "GoldChanged";
