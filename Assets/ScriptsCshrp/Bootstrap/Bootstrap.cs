@@ -26,9 +26,12 @@ public class Bootstrap : MonoBehaviour
 
     // _sceneLoader：场景加载器组件，处理场景切换。
     private SceneLoader _sceneLoader;
-    
+
     // _textManager：文本管理器，读取文本表并按编号提供文字。
     private TextManager _textManager;
+
+    // _gameStateManager：保存玩家操作权限的状态管理器。
+    private GameStateManager _gameStateManager;
 
     // ==================== Unity 生命周期 ====================
 
@@ -70,7 +73,8 @@ public class Bootstrap : MonoBehaviour
         _inputManager = CreateManager<InPutManager>("InputManager");
         _eventManager = CreateManager<EventManager>("EventManager");
         _sceneLoader = CreateManager<SceneLoader>("SceneLoader");
-        _textManager=CreateManager<TextManager>("TextManager");
+        _textManager = CreateManager<TextManager>("TextManager");
+        _gameStateManager = CreateManager<GameStateManager>("GameStateManager");
     }
 
     /// <summary>
@@ -78,7 +82,7 @@ public class Bootstrap : MonoBehaviour
     /// </summary>
     private void InitializeManagers()
     {
-        _uiManager.Initialize(_resourceManager, _eventManager);
+        _uiManager.Initialize(_resourceManager, _eventManager, _gameStateManager);
         _inputManager.Initialize(_eventManager);
         _sceneLoader.Initialize(_eventManager);
         _textManager.Initialize(_resourceManager);
@@ -105,13 +109,23 @@ public class Bootstrap : MonoBehaviour
     }
 
     /// <summary>
-    /// 获取已有的文本管理器
+    /// 获取已有的文本管理器。
     /// </summary>
-    /// <returns>启动时创建的文本管理器</returns>
+    /// <returns>启动时创建的文本管理器组件。</returns>
     public TextManager GetTextManager()
     {
         return _textManager;
     }
+
+    /// <summary>
+    /// 获取已有的状态管理器。
+    /// </summary>
+    /// <returns>启动时创建的状态管理器组件。</returns>
+    public GameStateManager GetGameStateManager()
+    {
+        return _gameStateManager;
+    }
+
     // ==================== 核心逻辑 ====================
 
     /// <summary>

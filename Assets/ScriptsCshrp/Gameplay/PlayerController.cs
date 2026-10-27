@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 控制玩家移动，查找并交互附近的目标。
+/// 根据操作权限控制玩家移动，并与附近目标交互。
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour
     // _interactRadius：以玩家为中心的交互检测半径。
     [SerializeField] private float _interactRadius = 1.5f;
 
-    // _moveDirection：保存本帧读取的移动方向。
+    // _moveDirection：保存移动方向，禁止操作时清零。
     [SerializeField] private Vector2 _moveDirection;
 
     // _inputManager：输入管理器组件，由场景入口传入。
@@ -24,6 +24,9 @@ public class PlayerController : MonoBehaviour
 
     // _rigidbody：玩家自身的二维刚体组件，用于移动。
     private Rigidbody2D _rigidbody;
+
+    // _gameStateManager：用于查询玩家操作权限的状态管理器。
+    private GameStateManager _gameStateManager;
 
     // ==================== Unity 生命周期 ====================
 
@@ -44,14 +47,21 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
-    /// 读取移动方向，响应交互键。
+    /// 根据操作权限读取移动方向并响应交互键。
     /// </summary>
     private void Update()
     {
-        // 第一步：读取并保存移动方向。
+        // 第一步：检查操作权限，禁止时清除方向并结束本次输入处理。
+        if (!_gameStateManager.CanPlayerControl())
+        {
+            _moveDirection = Vector2.zero;
+            return;
+        }
+
+        // 第二步：读取并保存移动方向。
         _moveDirection = _inputManager.GetMoveDirection();
 
-        // 第二步：按下交互键时查找目标。
+        // 第三步：按下交互键时查找目标。
         if (_inputManager.IsInteractPressed())
         {
             TryInteract();
@@ -69,12 +79,16 @@ public class PlayerController : MonoBehaviour
     // ==================== 初始化 ====================
 
     /// <summary>
-    /// 保存玩家使用的输入管理器。
+    /// 保存玩家使用的输入管理器和状态管理器。
     /// </summary>
     /// <param name="inputManager">用于查询玩家输入的输入管理器。</param>
-    public void Initialize(InPutManager inputManager)
+    /// <param name="gameStateManager">用于查询玩家操作权限的状态管理器。</param>
+    public void Initialize(
+        InPutManager inputManager,
+        GameStateManager gameStateManager)
     {
         _inputManager = inputManager;
+        _gameStateManager = gameStateManager;
     }
 
     // ==================== 对外接口 ====================
@@ -82,21 +96,28 @@ public class PlayerController : MonoBehaviour
     // ==================== 核心逻辑 ====================
 
     /// <summary>
-    /// 根据方向和奔跑状态设置刚体速度。
+    /// 根据操作权限、方向和奔跑状态设置刚体速度。
     /// </summary>
     private void Move()
     {
-        // 第一步：使用走路速度。
+        // 第一步：检查操作权限，禁止时停止刚体并结束本次移动。
+        if (!_gameStateManager.CanPlayerControl())
+        {
+            _rigidbody.velocity = Vector2.zero;
+            return;
+        }
+
+        // 第二步：使用走路速度。
         // currentSpeed：本次移动使用的速度。
         float currentSpeed = _moveSpeed;
 
-        // 第二步：按住奔跑键时改用跑步速度。
+        // 第三步：按住奔跑键时改用跑步速度。
         if (_inputManager.IsRunPressed())
         {
             currentSpeed = _runSpeed;
         }
 
-        // 第三步：统一方向长度，设置刚体速度。
+        // 第四步：统一方向长度，设置刚体速度。
         _rigidbody.velocity = _moveDirection.normalized * currentSpeed;
     }
 
@@ -129,7 +150,7 @@ public class PlayerController : MonoBehaviour
             if (interactableObject != null)
             {
                 // distance：玩家到当前目标的位置距离。
-                float distance = Vector2.Distance(transform.position,interactableObject.transform.position);
+                float distance = Vector2.Distance(transform.position, interactableObject.transform.position);
 
                 Debug.Log("目标：" + interactableObject.gameObject.name + "，距离：" + distance);
 

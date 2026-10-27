@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 创建农场玩家并设置相机跟随目标。
+/// 创建并初始化农场玩家，设置相机跟随目标。
 /// </summary>
 public class FarmSceneController : MonoBehaviour
 {
@@ -61,8 +61,11 @@ public class FarmSceneController : MonoBehaviour
             return;
         }
 
-        // 第三步：把输入管理器传给玩家。
-        playerController.Initialize(Bootstrap.Instance.GetInputManager());
+        // 第三步：把输入管理器和状态管理器传给玩家。
+        playerController.Initialize(
+            Bootstrap.Instance.GetInputManager(),
+            Bootstrap.Instance.GetGameStateManager()
+        );
 
         // 第四步：检查相机组件，设置跟随目标。
         if (_cameraFollow == null)

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 创建并复用界面，控制界面的显示和隐藏。
+/// 管理界面显示，并在设置开关时更新玩家操作权限。
 /// </summary>
 public class UIManager : MonoBehaviour
 {
@@ -18,6 +18,9 @@ public class UIManager : MonoBehaviour
 
     // _settingsUI：已创建的设置界面实例，关闭后保留复用。
     private GameObject _settingsUI;
+
+    // _gameStateManager：用于在设置开关时修改玩家操作权限。
+    private GameStateManager _gameStateManager;
 
     // ==================== Unity 生命周期 ====================
 
@@ -51,11 +54,16 @@ public class UIManager : MonoBehaviour
     /// </summary>
     /// <param name="resourceManager">用于加载和创建预制体的资源管理器。</param>
     /// <param name="eventManager">用于发布或订阅事件的事件管理器。</param>
-    public void Initialize(ResourceManager resourceManager, EventManager eventManager)
+    /// <param name="gameStateManager">用于在设置开关时修改玩家操作权限的状态管理器。</param>
+    public void Initialize(
+        ResourceManager resourceManager,
+        EventManager eventManager,
+        GameStateManager gameStateManager)
     {
-        // 第一步：保存资源和事件管理器。
+        // 第一步：保存资源、事件和状态管理器。
         _resourceManager = resourceManager;
         _eventManager = eventManager;
+        _gameStateManager = gameStateManager;
         Debug.Log("UIManager 已经接收到 ResourceManager");
 
         // 第二步：订阅背包和设置界面的操作事件。
@@ -118,7 +126,7 @@ public class UIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 首次创建并初始化设置界面，之后复用。
+    /// 创建或复用设置界面，显示后禁止玩家操作。
     /// </summary>
     public void OpenSettings()
     {
@@ -148,12 +156,13 @@ public class UIManager : MonoBehaviour
             _settingsUI = settingsObject;
         }
 
-        // 第四步：显示设置界面。
+        // 第四步：显示设置界面，并禁止玩家操作。
         _settingsUI.SetActive(true);
+        _gameStateManager.SetPlayerControl(false);
     }
 
     /// <summary>
-    /// 切换设置界面的显示状态。
+    /// 切换设置界面的显示状态，并更新玩家操作权限。
     /// </summary>
     public void ToggleSettings()
     {
@@ -173,13 +182,14 @@ public class UIManager : MonoBehaviour
     // ==================== 事件响应 ====================
 
     /// <summary>
-    /// 响应关闭请求，隐藏设置界面。
+    /// 隐藏设置界面，并恢复玩家操作。
     /// </summary>
     private void CloseSettings()
     {
         if (_settingsUI != null)
         {
             _settingsUI.SetActive(false);
+            _gameStateManager.SetPlayerControl(true);
         }
     }
 
