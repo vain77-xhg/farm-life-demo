@@ -4,14 +4,14 @@ using UnityEngine.UI;
 /// <summary>
 /// 监听设置界面的关闭按钮并发布关闭请求。
 /// </summary>
-public class SettingsUI : MonoBehaviour
+public class SettingsUI : UIBase
 {
     // ==================== 字段 ====================
 
     // _closeButton：预制体中的关闭按钮，在 Inspector 中绑定。
     [SerializeField] private Button _closeButton;
 
-    // _eventManager：事件管理器组件，由 UIManager 传入。
+    // _eventManager：由 UIManager 传入，用于发布关闭设置请求。
     private EventManager _eventManager;
 
     // ==================== Unity 生命周期 ====================
@@ -32,7 +32,7 @@ public class SettingsUI : MonoBehaviour
     /// <summary>
     /// 保存事件管理器并绑定关闭按钮。
     /// </summary>
-    /// <param name="eventManager">用于发布或订阅事件的事件管理器。</param>
+    /// <param name="eventManager">用于发布关闭设置请求的事件管理器。</param>
     public void Initialize(EventManager eventManager)
     {
         // 第一步：保存事件管理器。
@@ -67,5 +67,4 @@ public class SettingsUI : MonoBehaviour
     // ==================== 内部辅助 ====================
 
     // ==================== 调试显示 ====================
-
 }

@@ -19,7 +19,7 @@ public class StartupSceneTools
     // ==================== 对外接口 ====================
 
     /// <summary>
-    /// 通过编辑器菜单打开启动场景。
+    /// 确认场景保存选择后，通过编辑器菜单打开启动场景。
     /// </summary>
     [MenuItem("工具/打开启动场景")]
     private static void OpenStartupScene()
@@ -31,7 +31,7 @@ public class StartupSceneTools
             return;
         }
 
-        // 第二步：确认场景保存选择，取消时结束。
+        // 第二步：让用户选择是否保存当前场景修改，取消时不切换场景。
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
         {
             return;
@@ -48,5 +48,4 @@ public class StartupSceneTools
     // ==================== 内部辅助 ====================
 
     // ==================== 调试显示 ====================
-
 }

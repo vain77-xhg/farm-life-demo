@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 按事件名称保存回调，提供订阅、取消和发布方法。
+/// 按事件名称登记回调，发布时立即调用对应回调。
 /// </summary>
 public class EventManager : MonoBehaviour
 {
     // ==================== 字段 ====================
 
-    // _eventTable：事件名称与无参数回调对应的字典。
+    // _eventTable：只保存无参数事件名称及其回调。
     private readonly Dictionary<string, Action> _eventTable = new Dictionary<string, Action>();
 
-    // _intEventTable：事件名称与 int 参数回调对应的字典。
+    // _intEventTable：只保存 int 参数事件名称及其回调。
     private readonly Dictionary<string, Action<int>> _intEventTable = new Dictionary<string, Action<int>>();
 
-    // _stringEventTable：事件名称与 string 参数回调对应的字典。
+    // _stringEventTable：只保存 string 参数事件名称及其回调。
     private readonly Dictionary<string, Action<string>> _stringEventTable = new Dictionary<string, Action<string>>();
 
     // ==================== Unity 生命周期 ====================
@@ -25,7 +25,7 @@ public class EventManager : MonoBehaviour
     // ==================== 对外接口 ====================
 
     /// <summary>
-    /// 添加无参数事件的回调。
+    /// 登记无参数回调，等待对应事件发布。
     /// </summary>
     /// <param name="eventName">事件名称，用于查找对应回调。</param>
     /// <param name="callback">事件发布时执行的回调方法。</param>
@@ -77,12 +77,12 @@ public class EventManager : MonoBehaviour
             return;
         }
 
-        // 第二步：调用事件保存的回调。
+        // 第二步：立即调用该事件的已订阅回调。
         _eventTable[eventName]?.Invoke();
     }
 
     /// <summary>
-    /// 添加 int 参数事件的回调。
+    /// 登记接收 int 数据的回调，等待对应事件发布。
     /// </summary>
     /// <param name="eventName">事件名称，用于查找对应回调。</param>
     /// <param name="callback">事件发布时执行的回调方法。</param>
@@ -135,12 +135,12 @@ public class EventManager : MonoBehaviour
             return;
         }
 
-        // 第二步：调用事件保存的回调。
+        // 第二步：立即调用该事件的已订阅回调。
         _intEventTable[eventName]?.Invoke(value);
     }
 
     /// <summary>
-    /// 添加 string 参数事件的回调。
+    /// 登记接收 string 数据的回调，等待对应事件发布。
     /// </summary>
     /// <param name="eventName">事件名称，用于查找对应回调。</param>
     /// <param name="callback">事件发布时执行的回调方法。</param>
@@ -193,7 +193,7 @@ public class EventManager : MonoBehaviour
             return;
         }
 
-        // 第二步：调用事件保存的回调。
+        // 第二步：立即调用该事件的已订阅回调。
         _stringEventTable[eventName]?.Invoke(value);
     }
 
@@ -204,5 +204,4 @@ public class EventManager : MonoBehaviour
     // ==================== 内部辅助 ====================
 
     // ==================== 调试显示 ====================
-
 }

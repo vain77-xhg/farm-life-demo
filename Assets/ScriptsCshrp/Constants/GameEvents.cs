@@ -1,5 +1,5 @@
 /// <summary>
-/// 保存发布和订阅时使用的事件名称。
+/// 统一事件名称，供发布者和订阅者使用同一个名称。
 /// </summary>
 public static class GameEvents
 {
@@ -26,7 +26,7 @@ public static class GameEvents
     public const string LoadScene = "LoadScene";
 
     /// <summary>
-    /// ShowInteractionText：请求显示交互提示，使用 string 传递已查询的文字。
+    /// ShowInteractionText：显示交互提示，string 参数是查到的文字。
     /// </summary>
     public const string ShowInteractionText = "ShowInteractionText";
 
@@ -48,5 +48,4 @@ public static class GameEvents
     // ==================== 内部辅助 ====================
 
     // ==================== 调试显示 ====================
-
 }

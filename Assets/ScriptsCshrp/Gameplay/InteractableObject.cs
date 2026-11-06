@@ -1,13 +1,13 @@
 using UnityEngine;
 
 /// <summary>
-/// 响应玩家交互，请求显示配置的提示文字。
+/// 保存交互文本编号，并在交互时请求显示对应文字。
 /// </summary>
 public class InteractableObject : MonoBehaviour
 {
     // ==================== 字段 ====================
 
-    // _textId：当前物体交互时使用的文本编号。
+    // _textId：当前物体对应的文本编号，用于查询提示文字。
     [SerializeField] private int _textId;
 
     // ==================== Unity 生命周期 ====================
@@ -34,7 +34,7 @@ public class InteractableObject : MonoBehaviour
             return;
         }
 
-        // 第三步：取得事件管理器，发布显示请求。
+        // 第三步：取得事件管理器，把查到的文字发布给界面显示。
         // eventManager：用于发布交互提示显示请求的事件管理器。
         EventManager eventManager = Bootstrap.Instance.GetEventManager();
 
@@ -48,5 +48,4 @@ public class InteractableObject : MonoBehaviour
     // ==================== 内部辅助 ====================
 
     // ==================== 调试显示 ====================
-
 }

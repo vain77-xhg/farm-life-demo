@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8899979797901955401}
   - component: {fileID: 392471311760935434}
   - component: {fileID: 4704356050949290142}
+  - component: {fileID: 6825386710161001249}
   m_Layer: 5
   m_HasEditorInfo: 1
   m_Name: InventoryUI
@@ -103,6 +104,18 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &6825386710161001249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3749631644327407920}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5581f12fed3ad164f921ef9363722dea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5536238612015442334
 GameObject:
   m_ObjectHideFlags: 0

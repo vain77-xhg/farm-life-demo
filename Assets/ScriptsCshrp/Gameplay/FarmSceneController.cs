@@ -10,13 +10,13 @@ public class FarmSceneController : MonoBehaviour
     // _cameraFollow：场景相机的跟随组件，在 Inspector 中绑定。
     [SerializeField] private CameraFollow _cameraFollow;
 
-    // _resourceManager：资源管理器组件，用于创建玩家。
+    // _resourceManager：启动入口创建的资源管理器，用于实例化玩家预制体。
     private ResourceManager _resourceManager;
 
     // ==================== Unity 生命周期 ====================
 
     /// <summary>
-    /// 获取资源管理器并创建玩家。
+    /// 农场启动时获取管理器并创建玩家。
     /// </summary>
     private void Start()
     {
@@ -49,7 +49,7 @@ public class FarmSceneController : MonoBehaviour
             return;
         }
 
-        // 第二步：设置父对象，获取并检查玩家组件。
+        // 第二步：把玩家放到场景根对象下，并检查控制组件。
         player.transform.SetParent(transform, false);
 
         // playerController：玩家实例上的控制组件。
@@ -61,7 +61,7 @@ public class FarmSceneController : MonoBehaviour
             return;
         }
 
-        // 第三步：把输入管理器和状态管理器传给玩家。
+        // 第三步：把已有的输入管理器和状态管理器传给玩家。
         playerController.Initialize(
             Bootstrap.Instance.GetInputManager(),
             Bootstrap.Instance.GetGameStateManager()
@@ -86,5 +86,4 @@ public class FarmSceneController : MonoBehaviour
     // ==================== 内部辅助 ====================
 
     // ==================== 调试显示 ====================
-
 }

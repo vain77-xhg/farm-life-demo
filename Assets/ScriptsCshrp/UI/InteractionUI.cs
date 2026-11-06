@@ -2,9 +2,9 @@ using UnityEngine;
 using TMPro;
 
 /// <summary>
-/// 接收文字并更新交互提示的文字组件。
+/// 接收文字并更新交互提示界面的显示内容。
 /// </summary>
-public class InteractionUI : MonoBehaviour
+public class InteractionUI : UIBase
 {
     // ==================== 字段 ====================
 
@@ -33,5 +33,4 @@ public class InteractionUI : MonoBehaviour
     // ==================== 内部辅助 ====================
 
     // ==================== 调试显示 ====================
-
 }

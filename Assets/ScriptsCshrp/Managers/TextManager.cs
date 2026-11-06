@@ -10,10 +10,10 @@ public class TextManager : MonoBehaviour
 
     // _resourceManager：用于读取文本资源的资源管理器。
     private ResourceManager _resourceManager;
-    
+
     // _texts：保存文本编号与对应文字的字典。
     private Dictionary<int, string> _texts = new Dictionary<int, string>();
-    
+
     // ==================== Unity 生命周期 ====================
 
     // ==================== 初始化 ====================
@@ -27,7 +27,7 @@ public class TextManager : MonoBehaviour
         _resourceManager = resourceManager;
         LoadTexts();
     }
-    
+
     // ==================== 对外接口 ====================
 
     /// <summary>
@@ -46,34 +46,34 @@ public class TextManager : MonoBehaviour
         Debug.LogError("未找到文本 ID：" + textId);
         return "";
     }
-    
+
     // ==================== 核心逻辑 ====================
 
     /// <summary>
-    /// 读取文本表并更新文本字典。
+    /// 加载 CSV，检查各行并保存编号与文字。
     /// </summary>
     private void LoadTexts()
     {
         // 第一步：读取文本资源。
         // textAsset：加载到的 CSV 文本资源。
         TextAsset textAsset = _resourceManager.LoadTextAsset("Data/文本表");
-        
+
         if (textAsset != null)
         {
-            // 第二步：清除旧记录，并拆分文本行。
+            // 第二步：加载成功后清除旧记录，再按换行符拆分记录。
             _texts.Clear();
 
             // lines：保存文本表的每一行。
-            string[] lines = textAsset.text.Split('\n');    //Split('\n')：遇到换行符就拆分。
+            string[] lines = textAsset.text.Split('\n');    // Split('\n')：遇到换行符就拆分为多行。
 
-            // 第三步：跳过表头，检查并保存每条文本。
+            // 第三步：跳过表头，检查列数、编号和重复项，保存有效记录。
             // i：当前读取的行下标。
             for (int i = 1; i < lines.Length; i++)
             {
                 // line：去掉末尾回车符的当前行。
-                string line = lines[i].TrimEnd('\r');   //TrimEnd('\r')：去掉字符串末尾的回车符。
-                
-                //这一行没有有效内容就跳过，读取下一行。
+                string line = lines[i].TrimEnd('\r');   // TrimEnd('\r')：去掉行末回车符，文字内容不变。
+
+                // 当前行为空白时，跳过并读取下一行。
                 if (string.IsNullOrWhiteSpace(line))
                 {
                     continue;
@@ -107,6 +107,7 @@ public class TextManager : MonoBehaviour
             Debug.Log("已加载文本数量：" + _texts.Count);
         }
     }
+
     // ==================== 事件响应 ====================
 
     // ==================== 内部辅助 ====================
@@ -164,10 +165,10 @@ public class TextManager : MonoBehaviour
             return new string[0];
         }
 
-        // 第三步：保存最后一列，返回全部字段。
+        // 第三步：保存末尾没有逗号分隔的最后一列，返回全部字段。
         fields.Add(currentField);
         return fields.ToArray();
     }
-    // ==================== 调试显示 ====================
 
+    // ==================== 调试显示 ====================
 }

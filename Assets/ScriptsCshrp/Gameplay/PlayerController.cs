@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 根据操作权限控制玩家移动，并与附近目标交互。
+/// 根据操作权限移动玩家，并与附近最近的目标交互。
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour
     // _interactRadius：以玩家为中心的交互检测半径。
     [SerializeField] private float _interactRadius = 1.5f;
 
-    // _moveDirection：保存移动方向，禁止操作时清零。
+    // _moveDirection：最近一次读取的移动方向，禁止操作时清零。
     [SerializeField] private Vector2 _moveDirection;
 
     // _inputManager：输入管理器组件，由场景入口传入。
@@ -69,7 +69,7 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
-    /// 在物理时间步中执行移动。
+    /// 在物理更新时设置玩家的刚体速度。
     /// </summary>
     private void FixedUpdate()
     {
@@ -83,9 +83,7 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     /// <param name="inputManager">用于查询玩家输入的输入管理器。</param>
     /// <param name="gameStateManager">用于查询玩家操作权限的状态管理器。</param>
-    public void Initialize(
-        InPutManager inputManager,
-        GameStateManager gameStateManager)
+    public void Initialize(InPutManager inputManager, GameStateManager gameStateManager)
     {
         _inputManager = inputManager;
         _gameStateManager = gameStateManager;
@@ -117,17 +115,17 @@ public class PlayerController : MonoBehaviour
             currentSpeed = _runSpeed;
         }
 
-        // 第四步：统一方向长度，设置刚体速度。
+        // 第四步：统一方向长度，避免斜向移动更快，再设置刚体速度。
         _rigidbody.velocity = _moveDirection.normalized * currentSpeed;
     }
 
     /// <summary>
-    /// 与附近位置最近的可交互物体交互。
+    /// 从附近碰撞体中选出最近的可交互物体并执行交互。
     /// </summary>
     private void TryInteract()
     {
         // 第一步：检测附近的碰撞体。
-        // colliders：碰撞体数组，保存附近的检测结果。
+        // colliders：圆形范围内检测到的碰撞体，不一定都能交互。
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, _interactRadius);
 
         Debug.Log("检测到的碰撞体数量：" + colliders.Length);
@@ -146,10 +144,10 @@ public class PlayerController : MonoBehaviour
             // interactableObject：当前物体的交互组件，找不到时为空。
             InteractableObject interactableObject = collider.GetComponent<InteractableObject>();
 
-            // 有交互组件时，才计算距离。
+            // 只有带交互组件的物体才参与最近目标比较。
             if (interactableObject != null)
             {
-                // distance：玩家到当前目标的位置距离。
+                // distance：玩家与当前可交互物体之间的距离。
                 float distance = Vector2.Distance(transform.position, interactableObject.transform.position);
 
                 Debug.Log("目标：" + interactableObject.gameObject.name + "，距离：" + distance);
@@ -184,5 +182,4 @@ public class PlayerController : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, _interactRadius);
     }
-
 }

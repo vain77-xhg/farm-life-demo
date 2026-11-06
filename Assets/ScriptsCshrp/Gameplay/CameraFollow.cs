@@ -1,13 +1,13 @@
 using UnityEngine;
 
 /// <summary>
-/// 让相机跟随目标的位置。
+/// 让相机跟随目标的二维位置。
 /// </summary>
 public class CameraFollow : MonoBehaviour
 {
     // ==================== 字段 ====================
 
-    // _target：需要跟随的目标位置组件，由场景入口传入。
+    // _target：需要跟随的目标 Transform，由农场入口传入。
     private Transform _target;
 
     // ==================== Unity 生命周期 ====================
@@ -32,7 +32,7 @@ public class CameraFollow : MonoBehaviour
     /// <summary>
     /// 保存相机的跟随目标。
     /// </summary>
-    /// <param name="target">需要跟随的目标位置组件。</param>
+    /// <param name="target">相机需要跟随的目标 Transform。</param>
     public void Initialize(Transform target)
     {
         _target = target;
@@ -47,5 +47,4 @@ public class CameraFollow : MonoBehaviour
     // ==================== 内部辅助 ====================
 
     // ==================== 调试显示 ====================
-
 }

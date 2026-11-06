@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 创建并初始化游戏管理器，启动游戏。
+/// 创建并初始化管理器，启动跨场景游戏流程。
 /// </summary>
 public class Bootstrap : MonoBehaviour
 {
@@ -12,13 +12,13 @@ public class Bootstrap : MonoBehaviour
     /// </summary>
     public static Bootstrap Instance;
 
-    // _uiManager：界面管理器组件，控制背包和设置界面。
+    // _uiManager：界面管理器，负责加载、切换界面和更新玩家操作权限。
     private UIManager _uiManager;
 
     // _resourceManager：资源管理器，加载预制体和文本资源，并创建预制体实例。
     private ResourceManager _resourceManager;
 
-    // _inputManager：输入管理器组件，查询输入和发布界面事件。
+    // _inputManager：输入管理器，提供玩家输入查询并发布界面快捷键事件。
     private InPutManager _inputManager;
 
     // _eventManager：事件管理器组件，保存和调用事件回调。
@@ -64,7 +64,7 @@ public class Bootstrap : MonoBehaviour
     // ==================== 初始化 ====================
 
     /// <summary>
-    /// 创建各管理器并保存组件引用。
+    /// 创建所有管理器并保存引用，供下一步统一初始化。
     /// </summary>
     private void CreateManagers()
     {
@@ -78,13 +78,20 @@ public class Bootstrap : MonoBehaviour
     }
 
     /// <summary>
-    /// 向各管理器传入需要的依赖。
+    /// 传入管理器依赖，完成事件订阅和文本表加载。
     /// </summary>
     private void InitializeManagers()
     {
+        // 第一步：让界面管理器保存依赖并订阅界面事件。
         _uiManager.Initialize(_resourceManager, _eventManager, _gameStateManager);
+
+        // 第二步：让输入管理器保存事件发布入口。
         _inputManager.Initialize(_eventManager);
+
+        // 第三步：让场景加载器订阅场景加载请求。
         _sceneLoader.Initialize(_eventManager);
+
+        // 第四步：加载文本表，供游戏启动后的交互查询。
         _textManager.Initialize(_resourceManager);
     }
 
@@ -173,7 +180,7 @@ public class Bootstrap : MonoBehaviour
         // managerObject：新创建的管理器 GameObject。
         GameObject managerObject = new GameObject(objectName);
 
-        // 第二步：设置 Bootstrap 为父对象。
+        // 第二步：放到 Bootstrap 下，随启动入口跨场景保留。
         managerObject.transform.SetParent(transform);
 
         // 第三步：添加组件并返回。
@@ -183,5 +190,4 @@ public class Bootstrap : MonoBehaviour
     }
 
     // ==================== 调试显示 ====================
-
 }

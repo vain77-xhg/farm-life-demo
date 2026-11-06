@@ -1,5 +1,5 @@
 /// <summary>
-/// 保存游戏使用的场景名称。
+/// 统一场景名称，供场景加载请求引用。
 /// </summary>
 public static class GameScenes
 {
@@ -16,7 +16,7 @@ public static class GameScenes
     public const string TestScene = "TestScene";
 
     /// <summary>
-    /// FarmScene：农场游戏场景名称。
+    /// FarmScene：农场游戏场景，由启动流程发出加载请求。
     /// </summary>
     public const string FarmScene = "FarmScene";
 
@@ -33,5 +33,4 @@ public static class GameScenes
     // ==================== 内部辅助 ====================
 
     // ==================== 调试显示 ====================
-
 }

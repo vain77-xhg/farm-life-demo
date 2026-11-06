@@ -29,7 +29,7 @@ public class ResourceManager : MonoBehaviour
     public GameObject LoadPrefab(string path)
     {
         // 第一步：加载预制体资源。
-        // prefab：加载到的预制体资源。
+        // prefab：项目中的预制体资源，用于创建实例。
         GameObject prefab = Resources.Load<GameObject>(path);
 
         // 第二步：加载失败时返回空值。
@@ -52,7 +52,7 @@ public class ResourceManager : MonoBehaviour
     public GameObject InstantiatePrefab(string path)
     {
         // 第一步：加载资源，失败时结束。
-        // prefab：加载到的预制体资源。
+        // prefab：项目中的预制体资源，用于创建实例。
         GameObject prefab = LoadPrefab(path);
         if (prefab == null)
         {
@@ -64,7 +64,7 @@ public class ResourceManager : MonoBehaviour
         GameObject instance = Instantiate(prefab);
         return instance;
     }
-    
+
     /// <summary>
     /// 加载指定路径的文本资源。
     /// </summary>
@@ -73,7 +73,7 @@ public class ResourceManager : MonoBehaviour
     public TextAsset LoadTextAsset(string path)
     {
         // 第一步：加载文本资源。
-        // textAsset：加载到的文本资源。
+        // textAsset：包含文件原始文字的资源，具体解析交给调用者。
         TextAsset textAsset = Resources.Load<TextAsset>(path);
 
         // 第二步：加载失败时返回空值。
@@ -95,5 +95,4 @@ public class ResourceManager : MonoBehaviour
     // ==================== 内部辅助 ====================
 
     // ==================== 调试显示 ====================
-
 }

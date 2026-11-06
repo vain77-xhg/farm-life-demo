@@ -14,25 +14,25 @@ public class InPutManager : MonoBehaviour
     // ==================== Unity 生命周期 ====================
 
     /// <summary>
-    /// 检测界面快捷键和鼠标点击。
+    /// 逐帧发布界面快捷键事件，检测鼠标是否点击 UI。
     /// </summary>
     void Update()
     {
-        // 第一步：按 Tab 时发布背包切换事件。
+        // 第一步：按 Tab 时发布背包切换请求，不直接控制界面。
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             Debug.Log("检测到Tab按键按下");
             _eventManager.Publish(GameEvents.ToggleInventory);
         }
 
-        // 第二步：按 Escape 时发布设置切换事件。
+        // 第二步：按 Escape 时发布设置切换请求。
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Debug.Log("检测到ESC键按下");
             _eventManager.Publish(GameEvents.ToggleSettings);
         }
 
-        // 第三步：点击鼠标时输出所在区域。
+        // 第三步：借助 EventSystem 判断鼠标是否点在 UI 上并输出日志。
         if (Input.GetMouseButtonDown(0))
         {
             Debug.Log("检测到鼠标左键按下");
@@ -53,7 +53,7 @@ public class InPutManager : MonoBehaviour
     /// <summary>
     /// 保存用于发布事件的事件管理器。
     /// </summary>
-    /// <param name="eventManager">用于发布或订阅事件的事件管理器。</param>
+    /// <param name="eventManager">接收界面快捷键请求的事件管理器。</param>
     public void Initialize(EventManager eventManager)
     {
         _eventManager = eventManager;
@@ -64,14 +64,14 @@ public class InPutManager : MonoBehaviour
     /// <summary>
     /// 读取横向和纵向输入，返回移动方向。
     /// </summary>
-    /// <returns>由横向和纵向输入组成的方向向量。</returns>
+    /// <returns>尚未归一化的二维输入方向，不直接移动玩家。</returns>
     public Vector2 GetMoveDirection()
     {
         // 第一步：读取两个方向的输入值。
-        // horizontal：当前横向输入值。
+        // horizontal：横向输入值，负值向左、正值向右。
         float horizontal = Input.GetAxisRaw("Horizontal");
 
-        // vertical：当前纵向输入值。
+        // vertical：纵向输入值，负值向下、正值向上。
         float vertical = Input.GetAxisRaw("Vertical");
 
         // 第二步：组合并返回二维方向。
@@ -107,5 +107,4 @@ public class InPutManager : MonoBehaviour
     // ==================== 内部辅助 ====================
 
     // ==================== 调试显示 ====================
-
 }
