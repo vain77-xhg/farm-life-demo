@@ -33,6 +33,9 @@ public class Bootstrap : MonoBehaviour
     // _gameStateManager：保存玩家操作权限的状态管理器。
     private GameStateManager _gameStateManager;
 
+    // _timeManager：保存并推进游戏时间的管理器。
+    private TimeManager _timeManager;
+
     // ==================== Unity 生命周期 ====================
 
     /// <summary>
@@ -64,7 +67,7 @@ public class Bootstrap : MonoBehaviour
     // ==================== 初始化 ====================
 
     /// <summary>
-    /// 创建所有管理器并保存引用，供下一步统一初始化。
+    /// 创建所有管理器并保存组件引用。
     /// </summary>
     private void CreateManagers()
     {
@@ -75,6 +78,7 @@ public class Bootstrap : MonoBehaviour
         _sceneLoader = CreateManager<SceneLoader>("SceneLoader");
         _textManager = CreateManager<TextManager>("TextManager");
         _gameStateManager = CreateManager<GameStateManager>("GameStateManager");
+        _timeManager = CreateManager<TimeManager>("TimeManager");
     }
 
     /// <summary>
