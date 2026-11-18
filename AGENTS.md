@@ -45,21 +45,23 @@
 - 区分代码检查、编译检查和编辑器运行验证，不将历史反馈写成本轮已通过。
 - 用户暂缓的最近目标多目标测试不作为后续学习前置条件。
 
-## 当前基线（2026-11-16）
+## 当前基线（2026-11-18）
 
-- Assets 下有 20 个项目 C# 脚本。TimeManager 已作为第 8 个管理器接入启动，并保留临时逐分钟 Console 日志；用户反馈正常输出且无红色错误。原有 UI 的 7 项检查反馈和脚本分区约定保留。
-- Bootstrap 单例与管理器引用继续保留。StartGame 仍自动打开背包、创建并隐藏 TestCube，再发布 FarmScene 加载请求，不擅自删除这些启动测试。
-- UIBase 已有 Show/Hide、序列化操作规则及 CanPlayerControl()；InventoryUI、SettingsUI、InteractionUI 均继承 UIBase。UIManager 缓存组件，使用 UIBase 类型的 `_currentUI`、CreateUI<T>()、ShowUI(UIBase)、CloseUI(UIBase) 统一创建、互斥切换和权限。
-- OpenSettings 首次成功创建后正确调用 `_settingsUI.Initialize(_eventManager)`；SettingsUI 自己绑定和取消关闭按钮监听。InventoryUI 暂无依赖，不添加空初始化或虚初始化。
-- CloseSettings 保持 private 并调用 `CloseUI(_settingsUI);`，统一校验当前目标、隐藏并恢复权限。设置开关现已包含在用户反馈无问题的 UI 检查中；该反馈来自用户编辑器，助手只做代码检查。
-- InteractionUI 已接统一互斥，预制体 `_canPlayerControl: 1` 允许继续操作玩家。ShowInteractionText 使用 CreateUI<InteractionUI>，正确检查 `_interactionUI` 后 SetText→ShowUI→重启约 3 现实秒计时；结束先清句柄再 CloseUI(_interactionUI)。切换/关闭取消旧计时，目标校验避免误关新界面，隐藏后复用。
-- GameStateManager 与 PlayerController/UIManager 共享同一个引用；UI 按规则修改权限，玩家分别在 Update 和 Move 查询。限制期间界面快捷键仍继续处理。世界时间、物理/动画暂停尚未实现。
-- 最近核对 HEAD 仍为 `181dc90`，UI 重构已提交；当前时间基础和本次记录尚未提交。本轮先独立保存计时、查询、启动接入与 Debug 验证，不要求提前补齐暂停权限。
+- 当前 21 个项目 C# 脚本，仍在第一阶段。TimeManager、独立时钟权限和常驻 TimeUI 已接通；用户反馈时间推进、UI 暂停/恢复、提示计时和午夜换日正常。助手仅做代码与资源检查，未独立编译或运行。季节、年份、睡眠、02:00 未睡处理、物品/背包数据和存档仍待实现。
+- Bootstrap 先创建 8 个管理器，再初始化，最后 StartGame；StartGame 先显示常驻时钟，仍保留自动打开背包、创建并隐藏 TestCube、发布 FarmScene 请求。从 SampleScene 启动。
+- UIManager.Initialize 接收 ResourceManager、EventManager、GameStateManager、TimeManager、TextManager。TimeManager 和文本表初始化完成后，StartGame 才创建时钟。
+- TimeManager 由 Bootstrap 创建，Initialize(GameStateManager) 保存共享状态引用。初始为第 1 天 06:00（6*60），每 0.7 现实秒推进 1 游戏分钟，跨日不清零；禁止推进时在累计前返回并保留余量。GetHour=/60%24，GetMinute=%60，GetDay=/(24*60)+1。临时分钟日志保留。
+- GameStateManager 分别保存玩家操作和时钟推进权限。ShowUI 成功切换后设置 SetTimeAdvance(false)；CloseUI 校验并真正关闭当前目标后设置 true；CloseCurrentUI 不恢复权限。提示仍用 WaitForSecondsRealtime 计约 3 现实秒，常驻时钟不参加互斥或暂停。物理、动画暂停尚未实现。
+- TimeUI 继承 UIBase。UIManager.ShowTimeUI 用 CreateUI<TimeUI>("UI/TimeUI") 创建并缓存，首次传入 TimeManager 和 TextManager，之后直接调用自身 Show；不写入 _currentUI，不触发玩家或时钟权限更新。TimeUI 初始化时查询 400001“第{0}天”并缓存，Update 调用 RefreshTime，分别更新 DayText 和时间文字；内部逐分钟推进，时间显示按十分钟向下取整。
+- SettingsUI 自己绑定/取消关闭按钮；CloseSettings 保持 private 并调用 CloseUI(_settingsUI)。InventoryUI 暂无依赖，不添加空初始化或界面栈。
+- 原有背包/设置/交互提示保持统一互斥、最后有效请求替换和实例复用；提示预制体 _canPlayerControl: 1，允许操作玩家。创建失败保留旧界面仅做代码检查，未故障注入。
+- 用户已反馈：启动时钟显示、约 7 现实秒跳十分钟、背包暂停/恢复、背包与设置切换持续暂停、提示自动关闭恢复及提示换设置后不被旧计时影响均正常；午夜临时 23:59 测试显示“第1天 23:50→第2天 00:00”通过。当前初始值已恢复 6*60；布局锚点已做文件核对，不额外声称不同分辨率均经运行验证。
+- 本次整理前 HEAD 为 `39a3d38`（README 已提交）；时间、暂停、日期显示和本轮记录待用户提交。Git 由用户操作，不代为暂存、提交、推送或回滚。
 
 ## 文本与工程约定
 
 - int 数字文本 ID 按六/七/八位和号段分类，九位预留，完整规则见主文档。源表是 `Docs/DataTables/文本表.xlsx`，按号段分工作表；旧 `Texts.xlsx` 不使用。
-- 用户手动导出 UTF-8 CSV 到 `Assets/Resources/Data/文本表.csv`，运行时路径 `Data/文本表`。资源管理器加载，TextManager 解析缓存，交互物体保存 int ID、查询后发布 string 文字事件，UIManager 交给 InteractionUI 更新 TMP_Text。
+- 用户手动同步、合并 UTF-8 CSV 到 `Assets/Resources/Data/文本表.csv`，运行时路径 `Data/文本表`。资源管理器加载，TextManager 解析缓存，交互物体保存 int ID、查询后发布 string 文字事件，UIManager 交给 InteractionUI 更新 TMP_Text。
 - ParseCsvline() 保留当前拼写和单行解析范围；支持引号内逗号、转义双引号，检查列数、整数编号、重复编号和未闭合引号。用户暂不支持单元格内实际换行。
 - 文本资源成功加载后清空旧字典再填充；加载失败保留字典。缺失编号报错返回空字符串，空文字不发布显示；保留数量和错误日志，不恢复逐条测试日志。
 - InteractableObject 在 Interact() 内取得已有管理器，不在字段初始化中访问 Bootstrap.Instance。UIManager 的订阅和取消订阅配对保留。
@@ -69,12 +71,10 @@
 
 ## 后续规则与顺序
 
-- 本轮先由用户提交时间基础；下一轮由用户分步编写独立时钟推进权限，再逐步接入 UI 暂停和显示。其他未来 UI、物品/背包数据及存档继续待接，不引入界面栈或新事件参数系统。
-- 现有背包、设置、交互提示最多一个打开，最后处理的有效请求替换当前；准备失败保留旧界面，切换不临时恢复权限，最终关闭不恢复旧界面。该失败分支已做代码检查，不标为故障注入运行通过。未来 UI 按相同契约接入。
-- TimeManager 已接启动：Bootstrap 保存 `_timeManager`，CreateManagers 将其作为第 8 个管理器创建。它没有外部依赖，不添加空 Initialize。初始分钟为 6*60，GetHour()/GetMinute() 返回真实小时/分钟；Update 检查非正阈值后累计 Time.unscaledDeltaTime，用 while 每消耗足额秒数推进 1 游戏分钟，默认 0.7 现实秒/游戏分钟。每次推进后的 Debug.Log 是临时 Console 验证，输出真实分钟，不是时钟 UI。
-- 用户已反馈“正常输出，没有红色错误”，记录为时间基础的用户 Console 运行验证通过；助手仅静态审阅，未独立编译或运行。
-- GameStateManager 仍只有玩家操作权限，尚无 `_canTimeAdvance`、CanTimeAdvance()、SetTimeAdvance()。独立时钟权限由用户下一轮分步编写；UI 暂停、时钟 UI、日期和睡眠尚未接入，不要求提交前补齐。
-- 2026-11-16 用户已选择：内部仍逐个游戏分钟推进，界面时钟按 10 游戏分钟变化（06:00→06:10→06:20）。这只是显示粒度，不改变真实分钟或 GetHour/GetMinute；01:01 睡眠分界仍按真实分钟判断。时钟 UI 以后实现，不能记录为已显示或已运行。
-- 睡眠既定规则保留：初始 06:00，最晚活动到次日 02:00；活动日末尾 01:00 及以前睡则 06:00 醒，超过 01:00 睡则 7 游戏小时后醒。01:00→06:00、01:01→08:01 的分界不变，尚无睡眠代码。
-- 已确定各界面/对话打开暂停游戏时钟、关闭恢复且切换持续暂停的规则，基础计时已接启动，尚未接时钟 UI 或暂停；提示继续按现实秒计时。玩家权限、时钟暂停、物理/动画暂停分别处理。
-- 初始日期/日历、午夜日期变化与睡眠结算、02:00 未睡处理仍待定，不自行补全。详见主文档第十三、十四节。
+- 简历与源码分享话题已按用户要求暂停，恢复原有时间模块学习进度；继续由用户编写新功能，检查后附完整参考方法。
+- 2026-11-18 用户确定：自然日于午夜 00:00 加一天；睡眠只推进累计分钟，由跨越的午夜次数决定日期，不再额外加一天。当前 GetDay 是累计游戏日序号；季节名称后续也走文本表，季节长度、季节内天数及年份起始规则待讨论。
+- 原有睡眠规则保留：活动日末尾 01:00 及以前睡则 06:00 醒，超过 01:00 睡则 7 游戏小时后醒；01:00→06:00、01:01→08:01 的边界不变。睡眠和最晚次日 02:00 的处理尚无代码。
+- 现有常驻时钟与玩家打开的互斥界面分别管理；未来 UI 按对应契约接入，不引入界面栈或新事件参数系统。
+- 当前文本表有 300001、300002 和日期模板 400001。源表按分类编辑；运行 CSV 手动合并新增行，自动导表未实现。保留旧交互记录，不用单个分类导出覆盖全表。
+- 时钟预制体分别绑定 _dayText/_timeText；Panel 锚点与 Pivot 为 (1,1)，偏移 (-60,-60)，尺寸 300×300；文字与背景 Raycast Target 均关闭。保留用户布局。
+- 后续先按实际文件收尾并由用户保存本轮提交，再小步讨论/实现剩余日期与时间规则。季节、年份和睡眠未实现，不将本次日期序号显示当成完整日历或阶段一结束。

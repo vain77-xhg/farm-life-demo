@@ -30,7 +30,7 @@ public class Bootstrap : MonoBehaviour
     // _textManager：文本管理器，读取文本表并按编号提供文字。
     private TextManager _textManager;
 
-    // _gameStateManager：保存玩家操作权限的状态管理器。
+    // _gameStateManager：保存玩家操作与游戏时间推进权限的状态管理器。
     private GameStateManager _gameStateManager;
 
     // _timeManager：保存并推进游戏时间的管理器。
@@ -82,12 +82,12 @@ public class Bootstrap : MonoBehaviour
     }
 
     /// <summary>
-    /// 传入管理器依赖，完成事件订阅和文本表加载。
+    /// 传入管理器依赖，完成事件订阅、文本加载和时钟权限接入。
     /// </summary>
     private void InitializeManagers()
     {
         // 第一步：让界面管理器保存依赖并订阅界面事件。
-        _uiManager.Initialize(_resourceManager, _eventManager, _gameStateManager);
+        _uiManager.Initialize(_resourceManager, _eventManager, _gameStateManager, _timeManager, _textManager);
 
         // 第二步：让输入管理器保存事件发布入口。
         _inputManager.Initialize(_eventManager);
@@ -97,6 +97,9 @@ public class Bootstrap : MonoBehaviour
 
         // 第四步：加载文本表，供游戏启动后的交互查询。
         _textManager.Initialize(_resourceManager);
+
+        // 第五步：让时间管理器保存状态管理器引用。
+        _timeManager.Initialize(_gameStateManager);
     }
 
     // ==================== 对外接口 ====================
@@ -149,14 +152,18 @@ public class Bootstrap : MonoBehaviour
     // ==================== 核心逻辑 ====================
 
     /// <summary>
-    /// 执行背包、方块和场景切换的启动测试。
+    /// 显示初始界面，并执行方块和场景切换的启动测试。
     /// </summary>
     private void StartGame()
     {
-        // 第一步：打开背包。
+
+        // 第一步：显示常驻日期与时钟。
+        _uiManager.ShowTimeUI();
+
+        // 第二步：打开背包。
         _uiManager.OpenInventory();
 
-        // 第二步：创建测试方块，成功后隐藏。
+        // 第三步：创建测试方块，成功后隐藏。
         // testCube：启动测试时创建的方块实例。
         GameObject testCube = _resourceManager.InstantiatePrefab("prefabs/TestCube");
         if (testCube != null)
@@ -164,7 +171,7 @@ public class Bootstrap : MonoBehaviour
             testCube.SetActive(false);
         }
 
-        // 第三步：发布农场场景加载请求。
+        // 第四步：发布农场场景加载请求。
         _eventManager.PublishString(GameEvents.LoadScene, GameScenes.FarmScene);
     }
 

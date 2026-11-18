@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 /// <summary>
-/// 协调界面切换、交互提示计时和玩家操作权限。
+/// 管理界面切换、常驻时钟、提示计时及玩家和时钟权限。
 /// </summary>
 public class UIManager : MonoBehaviour
 {
@@ -20,7 +20,7 @@ public class UIManager : MonoBehaviour
     // _settingsUI：设置界面的控制组件，关闭后保留复用。
     private SettingsUI _settingsUI;
 
-    // _gameStateManager：用于保存和更新玩家移动、场景交互权限。
+    // _gameStateManager：保存和更新玩家操作与游戏时间推进权限。
     private GameStateManager _gameStateManager;
 
     // _interactionUI：已创建的交互提示界面组件，用于更新文字并复用界面。
@@ -34,6 +34,15 @@ public class UIManager : MonoBehaviour
 
     // _currentUI：通过统一入口显示的界面组件，没有当前记录时为 null。
     private UIBase _currentUI;
+
+    // _timeManager：提供游戏时间，供创建时钟界面时传入。
+    private TimeManager _timeManager;
+
+    // _timeUI：已创建的常驻时钟组件，用于显示和复用。
+    private TimeUI _timeUI;
+
+    // _textManager：按编号提供文本，供时钟界面查询日期模板。
+    private TextManager _textManager;
 
     // ==================== Unity 生命周期 ====================
 
@@ -68,16 +77,23 @@ public class UIManager : MonoBehaviour
     /// </summary>
     /// <param name="resourceManager">用于加载和创建预制体的资源管理器。</param>
     /// <param name="eventManager">用于发布或订阅事件的事件管理器。</param>
-    /// <param name="gameStateManager">用于更新玩家移动和场景交互权限的状态管理器。</param>
+    /// <param name="gameStateManager">用于更新玩家操作和游戏时间推进权限的状态管理器。</param>
+    /// <param name="timeManager">用于查询游戏时间的管理器。</param>
+    /// <param name="textManager">用于按编号查询文本的管理器。</param>
     public void Initialize(
         ResourceManager resourceManager,
         EventManager eventManager,
-        GameStateManager gameStateManager)
+        GameStateManager gameStateManager,
+        TimeManager timeManager,
+        TextManager textManager)
     {
-        // 第一步：保存资源、事件和状态管理器。
+        // 第一步：保存各管理器引用。
         _resourceManager = resourceManager;
         _eventManager = eventManager;
         _gameStateManager = gameStateManager;
+        _timeManager = timeManager;
+        _textManager = textManager;
+
         Debug.Log("UIManager 已经接收到 ResourceManager");
 
         // 第二步：订阅背包、设置和交互提示的界面事件。
@@ -156,7 +172,7 @@ public class UIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 关闭当前设置界面并恢复玩家操作。
+    /// 关闭当前设置界面，恢复玩家操作和游戏时间。
     /// </summary>
     private void CloseSettings()
     {
@@ -177,6 +193,31 @@ public class UIManager : MonoBehaviour
         {
             OpenSettings();
         }
+    }
+
+    // ---------- 常驻日期与时钟 ----------
+
+    /// <summary>
+    /// 创建或复用并显示常驻日期与时钟。
+    /// </summary>
+    public void ShowTimeUI()
+    {
+        // 第一步：首次显示时创建组件，失败则结束。
+        if (_timeUI == null)
+        {
+            _timeUI = CreateUI<TimeUI>("UI/TimeUI");
+
+            if (_timeUI == null)
+            {
+                return;
+            }
+
+            // 第二步：传入时间和文本管理器，准备初始显示。
+            _timeUI.Initialize(_timeManager, _textManager);
+        }
+
+        // 第三步：显示常驻界面，不改变当前互斥界面及权限。
+        _timeUI.Show();
     }
 
     // ---------- 交互提示 ----------
@@ -304,7 +345,7 @@ public class UIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 切换显示界面并应用目标界面的操作规则。
+    /// 切换互斥界面，更新玩家操作权限并暂停游戏时间。
     /// </summary>
     /// <param name="targetUI">准备显示的界面控制组件。</param>
     private void ShowUI(UIBase targetUI)
@@ -326,10 +367,13 @@ public class UIManager : MonoBehaviour
 
         // 第五步：根据目标界面的规则更新玩家操作权限。
         _gameStateManager.SetPlayerControl(targetUI.CanPlayerControl());
+
+        // 第六步：界面显示期间，暂停游戏时间。
+        _gameStateManager.SetTimeAdvance(false);
     }
 
     /// <summary>
-    /// 关闭指定的当前界面并恢复玩家操作。
+    /// 关闭指定的当前界面，恢复玩家操作和游戏时间。
     /// </summary>
     /// <param name="targetUI">请求关闭的界面控制组件。</param>
     private void CloseUI(UIBase targetUI)
@@ -345,6 +389,9 @@ public class UIManager : MonoBehaviour
 
         // 第三步：恢复玩家操作。
         _gameStateManager.SetPlayerControl(true);
+
+        // 第四步：当前界面关闭后，恢复游戏时间。
+        _gameStateManager.SetTimeAdvance(true);
     }
 
     // ==================== 调试显示 ====================

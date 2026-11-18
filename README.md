@@ -9,7 +9,7 @@
 - 团结引擎 1.8.5，工程记录的 Unity API 版本为 2022.3.62t7。
 - C#、UGUI、TextMeshPro、Git。
 
-## 当前已提交功能
+## 当前实现
 
 | 模块 | 实现内容 |
 | --- | --- |
@@ -19,7 +19,7 @@
 | 文本配置 | 从 CSV 加载文本，按整数 ID 查询；支持单行记录中的引号内逗号和转义双引号。 |
 | 事件通信 | 提供无参、int、string 三类事件，用于连接输入、交互、场景请求和 UI 响应。 |
 | UI 管理 | 预制体加载、组件缓存、界面互斥切换与玩家操作权限管理；交互提示约 3 个现实秒后隐藏，重复交互重新计时。 |
-| 时间基础 | 从 06:00 开始，默认每 0.7 个现实秒推进一个游戏分钟，保留计时余量，并通过 Console 输出真实游戏时间。 |
+| 日期与时间 | 从第 1 天 06:00 开始，每 0.7 个现实秒推进一个游戏分钟；午夜自动换日。常驻时钟分别显示“第1天”和十分钟粒度时间。日期使用文本表模板，UI 打开暂停、关闭恢复，切换期间持续暂停。 |
 
 背包目前提供界面展示与开关控制，尚未实现物品存取。
 
@@ -28,7 +28,7 @@
 1. 使用团结引擎 1.8.5 打开工程，等待资源导入和脚本编译完成。
 2. 打开 `Assets/Scenes/SampleScene.scene`，也可通过菜单“工具 → 打开启动场景”进入。
 3. 点击运行，Bootstrap 会初始化管理器并加载 FarmScene。
-4. 当前启动流程会自动打开背包，按 Tab 关闭后即可操作玩家。
+4. 当前启动流程会显示日期与时钟并自动打开背包；背包打开期间时间暂停，按 Tab 关闭后即可操作玩家并继续计时。
 
 SampleScene 是完整启动入口；FarmScene 依赖启动入口创建的管理器。
 
@@ -51,7 +51,8 @@ SampleScene 是完整启动入口；FarmScene 依赖启动入口创建的管理�
 | [InteractableObject.cs](Assets/ScriptsCshrp/Gameplay/InteractableObject.cs) | 根据文本 ID 查询内容并发布提示事件。 |
 | [TextManager.cs](Assets/ScriptsCshrp/Managers/TextManager.cs) | CSV 解析、字典缓存与文本查询。 |
 | [UIManager.cs](Assets/ScriptsCshrp/Managers/UIManager.cs) | 界面创建与复用、当前界面切换、提示计时与关闭目标校验。 |
-| [TimeManager.cs](Assets/ScriptsCshrp/Managers/TimeManager.cs) | 现实秒累计、游戏分钟推进与小时/分钟查询。 |
+| [TimeManager.cs](Assets/ScriptsCshrp/Managers/TimeManager.cs) | 时钟权限、现实秒累计、游戏分钟推进与日序号/时分查询。 |
+| [TimeUI.cs](Assets/ScriptsCshrp/UI/TimeUI.cs) | 日期模板查询、占位符替换，以及独立日期和时间文字刷新。 |
 
 一条完整的交互流程：
 
@@ -67,9 +68,8 @@ SampleScene 是完整启动入口；FarmScene 依赖启动入口创建的管理�
 
 ## 开发中与近期目标
 
-- 完成独立时钟权限、UI 打开时暂停时间与关闭后恢复的接入，并提交到仓库。
-- 接入常驻时钟界面：内部逐分钟推进，界面按十分钟显示。
-- 完成作品集演示闭环：移动与交互 → 采集物品 → 背包数量变化 → 达到目标后给出完成提示。
+- 按现有学习进度继续确定季节、年份及睡眠规则，并分步实现。
+- 后续制作采集物品、背包数量变化与目标反馈的可玩演示闭环。
 - 整理演示视频、截图与可运行版本。
 
 后续继续实现物品与背包数据、存档、种植等内容，再逐步扩展地图、NPC 与任务系统。

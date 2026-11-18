@@ -2,13 +2,13 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// 保存、推进并查询游戏时间。
+/// 保存、推进并查询游戏日期和时间。
 /// </summary>
 public class TimeManager : MonoBehaviour
 {
     // ==================== 字段 ====================
 
-    // _currentGameMinutes：从 00:00 起计算的游戏分钟数，初始为 06:00。
+    // _currentGameMinutes：从第 1 天 00:00 起累计的分钟数，初始为第 1 天 06:00，跨日不清零。
     private int _currentGameMinutes = 6 * 60;
 
     // _secondsPerGameMinute：推进一个游戏分钟所需的现实秒数。
@@ -17,6 +17,9 @@ public class TimeManager : MonoBehaviour
     // _elapsedRealSeconds：已累计、尚未用于推进的现实秒数。
     private float _elapsedRealSeconds = 0f;
 
+    // _gameStateManager：用于查询时钟推进权限的状态管理器。
+    private GameStateManager _gameStateManager;
+
     // ==================== Unity 生命周期 ====================
 
     /// <summary>
@@ -24,16 +27,22 @@ public class TimeManager : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        // 第一步：推进所需秒数无效时，结束本帧处理。
+        // 第一步：不允许时间推进时，结束本帧计时。
+        if (!_gameStateManager.CanTimeAdvance())
+        {
+            return;
+        }
+
+        // 第二步：推进所需秒数无效时，结束本帧处理。
         if (_secondsPerGameMinute <= 0f)
         {
             return;
         }
 
-        // 第二步：累计本帧经过的现实秒数。
+        // 第三步：累计本帧经过的现实秒数。
         _elapsedRealSeconds += Time.unscaledDeltaTime;
 
-        // 第三步：逐次消耗足额秒数，推进分钟并保留余量。
+        // 第四步：逐次消耗足额秒数，推进分钟并保留余量。
         while (_elapsedRealSeconds >= _secondsPerGameMinute)
         {
             _elapsedRealSeconds -= _secondsPerGameMinute;
@@ -45,6 +54,15 @@ public class TimeManager : MonoBehaviour
     }
 
     // ==================== 初始化 ====================
+
+    /// <summary>
+    /// 保存游戏状态管理器引用。
+    /// </summary>
+    /// <param name="gameStateManager">用于查询时钟推进权限的状态管理器。</param>
+    public void Initialize(GameStateManager gameStateManager)
+    {
+        _gameStateManager = gameStateManager;
+    }
 
     // ==================== 对外接口 ====================
 
@@ -64,6 +82,15 @@ public class TimeManager : MonoBehaviour
     public int GetMinute()
     {
         return _currentGameMinutes % 60;
+    }
+
+    /// <summary>
+    /// 查询当前是第几个游戏日。
+    /// </summary>
+    /// <returns>从 1 开始的游戏日序号。</returns>
+    public int GetDay()
+    {
+        return _currentGameMinutes / (24 * 60) + 1;
     }
 
     // ==================== 核心逻辑 ====================
