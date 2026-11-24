@@ -71,7 +71,7 @@ public class TimeUI : UIBase
     {
         // 第一步：读取真实日期和时间。
         // day：从 1 开始的游戏日序号。
-        int day = _timeManager.GetDay();
+        int day = _timeManager.GetDayOfSeason();
 
         // hour：当前游戏小时。
         int hour = _timeManager.GetHour();

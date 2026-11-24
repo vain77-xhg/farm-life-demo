@@ -20,6 +20,12 @@ public class TimeManager : MonoBehaviour
     // _gameStateManager：用于查询时钟推进权限的状态管理器。
     private GameStateManager _gameStateManager;
 
+    // _daysPerSeason：每个季节包含的游戏天数。
+    private int _daysPerSeason = 28;
+
+    // _seasonsPerYear：每个游戏年包含的季节数量。
+    private int _seasonsPerYear = 4;
+
     // ==================== Unity 生命周期 ====================
 
     /// <summary>
@@ -93,6 +99,27 @@ public class TimeManager : MonoBehaviour
         return _currentGameMinutes / (24 * 60) + 1;
     }
 
+    /// <summary>
+    /// 查询当前是季节内的第几天。
+    /// </summary>
+    /// <returns>从 1 开始的季节内日期。</returns>
+    public int GetDayOfSeason()
+    {
+        return (GetDay() - 1) % _daysPerSeason + 1;
+    }
+
+    /// <summary>
+    /// 查询当前季节。
+    /// </summary>
+    /// <returns>当前季节对应的枚举值。</returns>
+    public GameSeason GetSeason()
+    {
+        // seasonIndex：当前季节序号，0～3 分别对应春夏秋冬。
+        int seasonIndex = (GetDay() - 1) / _daysPerSeason % _seasonsPerYear;
+        
+        return (GameSeason)seasonIndex;
+    }
+    
     // ==================== 核心逻辑 ====================
 
     // ==================== 事件响应 ====================
