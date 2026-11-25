@@ -116,15 +116,96 @@ public class TimeManager : MonoBehaviour
     {
         // seasonIndex：当前季节序号，0～3 分别对应春夏秋冬。
         int seasonIndex = (GetDay() - 1) / _daysPerSeason % _seasonsPerYear;
-        
+
         return (GameSeason)seasonIndex;
     }
-    
+
+    /// <summary>
+    /// 查询当前是第几个游戏年。
+    /// </summary>
+    /// <returns>从 1 开始的游戏年份。</returns>
+    public int GetYear()
+    {
+        // daysPerYear：一个游戏年包含的天数。
+        int daysPerYear = _daysPerSeason * _seasonsPerYear;
+        return (GetDay() - 1) / daysPerYear + 1;
+    }
+
+    /// <summary>
+    /// 将游戏时钟直接推进到起床时刻，并重置计时余量。
+    /// </summary>
+    public void Sleep()
+    {
+        // wakeUpMinutes：按当前入睡时刻算出的起床累计分钟数。
+        int wakeUpMinutes = CalculateWakeUpMinutes();
+
+        _currentGameMinutes = wakeUpMinutes;
+
+        _elapsedRealSeconds = 0f;
+    }
+
     // ==================== 核心逻辑 ====================
 
     // ==================== 事件响应 ====================
 
     // ==================== 内部辅助 ====================
 
+    /// <summary>
+    /// 计算当前时刻之后的下一次早上 06:00。
+    /// </summary>
+    /// <returns>下一次 06:00 对应的累计游戏分钟数。</returns>
+    private int GetNextMorningMinutes()
+    {
+        // todayStart：今天 00:00 对应的累计游戏分钟数。
+        int todayStart = _currentGameMinutes - _currentGameMinutes % (24 * 60);
+
+        // nextMorning：先取今天 06:00，必要时移到明天。
+        int nextMorning = todayStart + 6 * 60;
+
+        if (nextMorning <= _currentGameMinutes)
+        {
+            nextMorning += 24 * 60;
+        }
+
+        return nextMorning;
+    }
+
+    /// <summary>
+    /// 按当前入睡时刻计算起床时间。
+    /// </summary>
+    /// <returns>起床时刻对应的累计游戏分钟数。</returns>
+    private int CalculateWakeUpMinutes()
+    {
+        // normalWakeUp：早睡时的目标，也就是下一次 06:00。
+        int normalWakeUp = GetNextMorningMinutes();
+
+        // sleepDeadline：这次 06:00 之前的凌晨 01:00，仍可按早睡规则起床。
+        int sleepDeadline = normalWakeUp - 5 * 60;
+
+        if (_currentGameMinutes <= sleepDeadline)
+        {
+            return normalWakeUp;
+        }
+
+        // 超过凌晨 01:00 时，睡满 7 个游戏小时。
+        return _currentGameMinutes + 7 * 60;
+    }
+
     // ==================== 调试显示 ====================
+
+    /// <summary>
+    /// 从第 1 天 23:00 测试睡眠后的时间跳转。
+    /// </summary>
+    [ContextMenu("测试睡眠：23点入睡")]
+    private void DebugSleepAtNight()
+    {
+        if (!Application.isPlaying)
+        {
+            return;
+        }
+
+        // 固定入睡时刻，方便在编辑器中重复验证。
+        _currentGameMinutes = 23 * 60;
+        Sleep();
+    }
 }
