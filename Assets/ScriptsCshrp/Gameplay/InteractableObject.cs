@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 保存交互文本编号，并在交互时请求显示对应文字。
+/// 提供场景物体的交互入口，默认显示配置的文字提示。
 /// </summary>
 public class InteractableObject : MonoBehaviour
 {
@@ -17,9 +17,9 @@ public class InteractableObject : MonoBehaviour
     // ==================== 对外接口 ====================
 
     /// <summary>
-    /// 查询交互文字，并发布显示请求。
+    /// 查询并请求显示交互文字，子类可以重写此方法来执行其他行为。
     /// </summary>
-    public void Interact()
+    public virtual void Interact()
     {
         // 第一步：查询当前物体对应的文字。
         // textManager：启动时创建的文本管理器。

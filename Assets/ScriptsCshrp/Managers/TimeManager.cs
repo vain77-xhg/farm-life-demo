@@ -29,7 +29,7 @@ public class TimeManager : MonoBehaviour
     // ==================== Unity 生命周期 ====================
 
     /// <summary>
-    /// 累计现实时间并推进游戏分钟。
+    /// 累计现实时间并推进游戏分钟，到凌晨 02:00 时自动入睡。
     /// </summary>
     private void Update()
     {
@@ -54,8 +54,12 @@ public class TimeManager : MonoBehaviour
             _elapsedRealSeconds -= _secondsPerGameMinute;
             _currentGameMinutes++;
 
-            // 临时输出每个游戏分钟，供 Console 验证推进。
-            Debug.Log("游戏时间：" + GetHour() + ":" + GetMinute());
+            // 到凌晨 02:00 就睡到 09:00，并结束本帧的计时。
+            if (GetHour() == 2 && GetMinute() == 0)
+            {
+                Sleep();
+                return;
+            }
         }
     }
 
@@ -192,20 +196,4 @@ public class TimeManager : MonoBehaviour
     }
 
     // ==================== 调试显示 ====================
-
-    /// <summary>
-    /// 从第 1 天 23:00 测试睡眠后的时间跳转。
-    /// </summary>
-    [ContextMenu("测试睡眠：23点入睡")]
-    private void DebugSleepAtNight()
-    {
-        if (!Application.isPlaying)
-        {
-            return;
-        }
-
-        // 固定入睡时刻，方便在编辑器中重复验证。
-        _currentGameMinutes = 23 * 60;
-        Sleep();
-    }
 }

@@ -149,6 +149,15 @@ public class Bootstrap : MonoBehaviour
         return _eventManager;
     }
 
+    /// <summary>
+    /// 获取已有的时间管理器。
+    /// </summary>
+    /// <returns>启动时创建的时间管理器组件。</returns>
+    public TimeManager GetTimeManager()
+    {
+        return _timeManager;
+    }
+
     // ==================== 核心逻辑 ====================
 
     /// <summary>
